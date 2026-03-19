@@ -1,0 +1,184 @@
+{% extends 'exams/centered_template.html' %}
+{% load static %}
+
+{% block page_title %}
+Test Series Engine
+{% endblock %}
+
+
+{% block head_css %}
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block head_js %}
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+{% endblock %}
+
+{% block page_content %}
+
+
+
+
+<div class="row mb-4">
+
+
+    <!-- Left Panel -->
+    <div class="col-md-8">
+        <div class="card p-4 shadow-sm h-100">
+
+            <h4>Select Test Package</h4>
+            <select name="package" class="form-select" style="max-width: 400px;"
+                onchange="document.cookie='selected_pkg_id=' + this.value + ';path=/;max-age=1209600'; location.reload();">
+
+                <option value="" disabled {% if not selected_package %}selected{% endif %}>Choose a package...</option>
+
+                {% for pkg in packages %}
+                <option value="{{ pkg.package_id }}" {% if request.COOKIES.selected_pkg_id == pkg.package_id|stringformat:"s" %}selected{% endif %}>
+                    {{ pkg.code }} - {{ pkg.name }}
+                </option>
+                {% endfor %}
+
+            </select>
+            <hr>
+
+
+            <h5>Package Information</h5>
+            <!-- <img src="{% static 'gateoverflow_exam_images/13913941114569567058.png' %}" alt="Test Image" style="max-width: 300px; border: 1px solid var(--border-color);"> -->
+            <div class="border border-secondary p-3 rounded" style="background-color: rgba(255,255,255,0.05);">
+                <div class="d-flex flex-wrap gap-2 my-2 fs-5 user-select-none">
+
+                    <span role="button" class="badge bg-secondary stat-badge" data-filter="">Total Exams: {{ package_stats.total_exams }}</span>
+                    <span role="button" class="badge bg-dark stat-badge" data-filter="mock">Mock Tests: {{ package_stats.mock_tests }}</span>
+                    <span role="button" class="badge bg-dark stat-badge" data-filter="subject wise">Subject Wise: {{ package_stats.swts }}</span>
+                    <span role="button" class="badge bg-dark stat-badge" data-filter="topic wise">Topic Wise: {{ package_stats.twts }}</span>
+                    {% if package_stats.misc > 0 %}
+                    <span class="badge bg-dark">Misc: {{ package_stats.misc }}</span>
+                    {% endif %}
+                    <span class="badge bg-dark">Total Qs: {{ package_stats.total_questions }}</span>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Right Panel -->
+    {% if request.user.is_superuser or request.user.is_staff %}
+    <div class="col-md-4">
+
+        <div class="card p-4 shadow-sm h-100">
+            <h4>Admin Controls</h4>
+            <hr>
+            <a href="{% url 'upload_package' %}" class="btn-custom w-100 mb-3">Upload Package Data</a>
+            <a class="btn-custom w-100 mb-3" href="{% url 'upload_attempts' %}">Upload Attempt Data</a>
+        </div>
+
+    </div>
+    {% endif %}
+
+
+</div>
+
+
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card p-4 shadow-sm">
+            <h4 class="mb-3">Exams in {{ selected_package.code|default:"Package" }}</h4>
+            <div class="table-responsive">
+
+
+                <table id="examsTable" class="table table-striped table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Created Date</th>
+                            <th>Questions</th>
+                            <th>Total Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for exam in exams %}
+                        <tr>
+                            <td><a target="_blank" href="{% url 'exam_details' exam.exam_id %}" class="text-decoration-none text-info fw-bold">{{ exam.display_title }}</a></td>
+                            <td>{{ exam.created_date|slice:":10" }}</td>
+                            <td>{{ exam.total_questions }}</td>
+                            <td>{{ exam.total_marks }}</td>
+                            <td>
+                                <button class="btn-custom btn-sm mb-1" disabled>Take Exam</button>
+                                {% if request.user.is_superuser or request.user.is_staff %}
+                                <a href="{% url 'question_paper' exam.exam_id %}" target="_blank"
+                                    class="btn-custom btn-sm" style="background-color: #6c757d;">View Paper</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block end_js %}
+
+
+<script>
+
+
+    $(document).ready(function () {
+        $('#examsTable').DataTable({
+            "pageLength": 25,
+            "order": [[1, "desc"]]
+        });
+
+
+        const table = $('#examsTable').DataTable();
+
+        $('.stat-badge').on('click', function() {
+            const badge = $(this);
+            let term = badge.data('filter');
+        
+            const isSelected = badge.hasClass('bg-secondary');
+
+            if(isSelected){
+                if(term){
+                    $('.stat-badge').removeClass('bg-secondary').addClass('bg-dark');
+                }
+                $('.stat-badge').first().removeClass('bg-dark').addClass('bg-secondary');
+                term = '';
+            }
+            else{
+                $('.stat-badge').removeClass('bg-secondary').addClass('bg-dark');
+                badge.removeClass('bg-dark').addClass('bg-secondary');
+            }
+            table.search(term).draw();
+        });
+    });
+
+
+</script>
+
+
+{% endblock %}

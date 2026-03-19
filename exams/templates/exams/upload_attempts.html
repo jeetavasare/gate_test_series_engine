@@ -1,0 +1,52 @@
+{% extends 'exams/centered_template.html' %}
+{% block page_content %}
+<div class="mb-4">
+    <a href="{% url 'home' %}" class="btn-custom mb-3">&larr; Back to Home</a>
+    <h2>Upload Attempt Data (Phase 2)</h2>
+</div>
+
+{% if result %}
+<div class="alert alert-success">
+    <h5>Upload Complete</h5>
+    <p class="mb-1">Attempts Inserted: {{ result.attempts_inserted }}</p>
+    {% if result.skipped_files > 0 %}
+    <p class="mb-0 text-warning">Files Skipped (Invalid/Corrupted): {{ result.skipped_files }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card p-4 shadow-sm">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label class="fw-bold mb-2">Target User for these Attempts</label>
+            <select name="user_id" class="form-select" required>
+                <option value="" disabled selected>Select a user...</option>
+                {% for u in users %}
+                    <option value="{{ u.user_id }}">{{ u.username }} ({{ u.full_name }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <hr class="mb-4 border-secondary">
+
+        <div class="mb-3">
+            <label>GATE Mock Results (JSON) - Contains Submission Times & Ranks</label>
+            <input type="file" name="results_json" class="form-control" accept=".json" required>
+        </div>
+            
+        <div class="mb-4">
+            <label>Offline Exam HTML Files (Multiple Selection Allowed)</label>
+            <input type="file" name="html_files" class="form-control" accept=".html" multiple required>
+            <small class="text-muted mt-1 d-block">Hold CTRL/CMD to select multiple files at once.</small>
+        </div>
+        
+        <button type="submit" class="btn-custom w-100">Process Attempts</button>
+    </form>
+</div>
+{% endblock %}
