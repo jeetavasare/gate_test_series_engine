@@ -1,0 +1,71 @@
+{% extends 'exams/centered_template.html' %}
+
+{% load static %}
+
+
+{% block page_title %}
+Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_award|floatformat:0}}m
+{% endblock %}
+
+
+{% block head_js %}
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="{% static 'js/register_with_math_jax.js' %}"></script>
+
+{% endblock %}
+
+{% block page_content %}
+
+<div class="card p-4 shadow-sm mb-4">
+    <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
+        <span class="oval-pill">Q</span>
+        <span class="pill-small custom-bg-dark fs-6">{{ question.q_type }}</span>
+        <span class="pill-small custom-bg-dark fs-6">Award: <span>{{ question.marks_award }}</span></span>
+        <span class="pill-small custom-bg-dark fs-6">Penalty:
+            <span>{{question.marks_penalty|floatformat:2}}</span></span>
+        <span class="pill-small custom-bg-dark fs-6">{{ question.category }}</span>
+        <button class="btn btn-sm btn-outline-secondary copy-btn ms-auto" title="Copy question text"
+            data-qid="{{ question.q_id }}">📄 </button>
+    </div>
+
+    <hr>
+    <div class="question-content" style="/* max-height: 800px ;*/ font-size: 1.1rem;">
+        {{ question.question_html|safe }}
+    </div>
+    <hr>
+    <div class="d-flex gap-3 align-items-center">
+        <div class="custom-bg-dark pill-small">
+            Correct Answer: {{ question.correct_answer }}
+        </div>
+        <div>
+            <a target="_blank" class="btn-custom pill-small"
+                href="https://gateoverflow.in/{{ question.q_id }}">Discuss</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="card p-4 shadow-sm mb-4">
+    <h3>In Exams</h3>
+    <hr class="mt-1 mb-4">
+    <div class="d-flex flex-column gap-2 mb-2 flex-wrap">
+
+        {% for eq in question.question_exams.all %}
+        <div>
+            <a target="_blank" href="{% url 'exam_details' eq.exam.exam_id %}" class="text-decoration-none text-reset">
+                <h5 class="mb-1">{{ eq.exam.display_title }}</h5>
+            </a>
+            Average Accuracy of this question:
+            <span class="fw-semibold"
+                style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }};color:var(--local-color)">{{eq.accuracy_percent}}%
+            </span>
+            <hr>
+        </div>
+
+        {% endfor %}
+    </div>
+
+
+</div>
+
+{% endblock %}

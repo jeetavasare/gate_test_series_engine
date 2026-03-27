@@ -317,3 +317,19 @@ def results_view(request, attempt_id):
     }
     
     return render(request, 'exams/results_view.html', context)
+
+@login_required(login_url='login')
+def view_question(request, question_id):
+    question = get_object_or_404(Question.objects.prefetch_related(Prefetch(
+            'question_exams',
+            queryset=ExamQuestion.objects.select_related('exam')
+        )), q_id=question_id)
+    short_q_type = question_type_short_form[question.q_type]
+    question.question_html = replace_question_image_link(question.question_html)
+
+    
+    context = {
+        'question': question,
+        'short_q_type': short_q_type,
+    }
+    return render(request, 'exams/question_view.html',context)

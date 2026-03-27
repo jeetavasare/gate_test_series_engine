@@ -59,7 +59,11 @@ Que Paper: {{exam.display_title}}
         <div class="card p-4 shadow-sm mb-4"
             style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }}; border-left: 5px solid var(--local-color);">
             <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
-                <span class="oval-pill">Q{{ eq.original_order|default:forloop.counter }}</span>
+                <span class="oval-pill">
+                    <a class="text-decoration-none text-reset" href="{% url 'view_question' eq.question_id %}">
+                        Q{{eq.original_order|default:forloop.counter }}
+                    </a>
+                </span>
                 <span class="pill-small custom-bg-dark fs-6">{{ eq.question.q_type }}</span>
                 <span class="pill-small custom-bg-dark fs-6">Award: <span>{{ eq.question.marks_award }}</span></span>
                 <span class="pill-small custom-bg-dark fs-6">Penalty:

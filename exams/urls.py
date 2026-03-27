@@ -13,4 +13,5 @@ urlpatterns = [
     path('upload-attempts/', views.upload_attempts_view, name='upload_attempts'),
     path('api/get-question-text/<int:q_id>/', views.get_question_text, name='get_question_text'),
     path('results/<int:attempt_id>/', views.results_view, name='results_view'),
+    path('question/<int:question_id>/', views.view_question, name='view_question'),
 ]
