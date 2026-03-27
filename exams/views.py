@@ -239,8 +239,8 @@ def upload_attempts_view(request):
 def get_question_text(request, q_id):
     try:
         # We only need the HTML field
-        question = Question.objects.only('question_html').get(q_id=q_id)
-        return JsonResponse({'success': True, 'html': question.question_html})
+        question = Question.objects.only('question_html', 'correct_answer').get(q_id=q_id)
+        return JsonResponse({'success': True, 'html': question.question_html, 'correct_answer': question.correct_answer})
     except Question.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Question not found'}, status=404)
     
