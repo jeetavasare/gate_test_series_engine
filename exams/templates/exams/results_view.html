@@ -118,7 +118,7 @@ Result: {{exam.display_title}}
                     <div class="d-flex flex-column gap-3 fs-5">
                         <div>
                             <span class="fw-semibold">Total Score:</span>
-                            <span class="fs-3">{{ resultant_marks|floatformat:2 }} </span>
+                            <span class="fs-3 fw-semibold">{{ resultant_marks|floatformat:2 }} </span>
                             <span class="text-muted fs-6">/ {{ exam.total_marks|floatformat:0 }}</span>
                             {% if medal %}
                             <span class="medal" title="{{medal_title}}">{{medal}}</span>
@@ -193,7 +193,8 @@ Result: {{exam.display_title}}
                         <hr class="my-1 border-secondary">
 
                         <div>
-                            <span class="fw-semibold">Accuracy:</span> {{ perf.overall_accuracy|floatformat:1 }}%
+                            <span class="fw-semibold">Accuracy:</span>
+                            <span class="fs-3 fw-semibold">{{ perf.overall_accuracy|floatformat:1 }}%</span>
                             <span class="text-muted fs-6">
                                 (<span title="1M Accuracy">{{ perf.1m_accuracy|floatformat:1}}%</span> +
                                 <span title="2M Accuracy">{{ perf.2m_accuracy|floatformat:1}}%</span>)
@@ -209,80 +210,103 @@ Result: {{exam.display_title}}
                     <h4 class="mb-4">Marks Breakdown <span class="text-muted fs-6 fw-normal">(1M + 2M)</span></h4>
                     <div class="d-flex flex-column gap-3 fs-5">
 
-                        <div>
-                            <span class="fw-semibold">Total Questions:</span> {{ exam.total_questions }}
-                            <span class="text-muted fs-6">(<span title="1M Questions">{{ perf.1m_total_q }}</span> +
-                                <span title="2M Questions">{{ perf.2m_total_q }}</span>)</span>
-                        </div>
+                        <table class="table-borderless table-sm w-auto mb-0" style="background-color: transparent;">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Total Questions</td>
+                                    <td>
+                                        {{ exam.total_questions }}
+                                        <span class="text-muted fs-6">(<span title="1M Questions">{{ perf.1m_total_q }}</span> + <span title="2M Questions">{{ perf.2m_total_q }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold">Attempted:</span> {{ perf.total_attempts }}
-                            <span class="text-muted fs-6">(<span title="1M Attempted">{{ perf.1m_attempts }}</span> +
-                                <span title="2M Attempted">{{ perf.2m_attempts }}</span>)</span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Attempted</td>
+                                    <td>
+                                        {{ perf.total_attempts }}
+                                        <span class="text-muted fs-6">(<span title="1M Attempted">{{ perf.1m_attempts }}</span> + <span title="2M Attempted">{{ perf.2m_attempts }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold text-success">Correct:</span> {{ perf.total_correct }}
-                            <span class="text-muted fs-6">(<span title="1M Correct">{{ perf.1m_correct }}</span> + <span
-                                    title="2M Correct">{{ perf.2m_correct }}</span>)</span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold text-success ps-0">Correct</td>
+                                    <td>
+                                        {{ perf.total_correct }}
+                                        <span class="text-muted fs-6">(<span title="1M Correct">{{ perf.1m_correct }}</span> + <span title="2M Correct">{{ perf.2m_correct }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold text-danger">Incorrect:</span> {{ perf.total_incorrect }}
-                            <span class="text-muted fs-6">(<span title="1M Incorrect">{{ perf.1m_incorrect }}</span> +
-                                <span title="2M Incorrect">{{ perf.2m_incorrect }}</span>)</span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold text-danger ps-0">Incorrect</td>
+                                    <td>
+                                        {{ perf.total_incorrect }}
+                                        <span class="text-muted fs-6">(<span title="1M Incorrect">{{ perf.1m_incorrect }}</span> + <span title="2M Incorrect">{{ perf.2m_incorrect }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold text-secondary">Skipped:</span> {{ perf.total_skipped }}
-                            <span class="text-muted fs-6">(<span title="1M Skipped">{{ perf.1m_skipped }}</span> + <span
-                                    title="2M Skipped">{{ perf.2m_skipped }}</span>)</span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold text-secondary ps-0">Skipped</td>
+                                    <td>
+                                        {{ perf.total_skipped }}
+                                        <span class="text-muted fs-6">(<span title="1M Skipped">{{ perf.1m_skipped }}</span> + <span title="2M Skipped">{{ perf.2m_skipped }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <hr class="my-1 border-secondary">
+                                <tr class="">
+                                    <td colspan="2" class="px-0 py-4">
+                                        <hr class="my-1 border-secondary">
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold">Attempted Marks:</span> {{ perf.total_attempted_m|floatformat:2 }}
-                            <span class="text-muted fs-6">
-                                (<span title="1M Attempted Marks">{{perf.1m_attempted_m|floatformat:2 }}</span> +
-                                <span title="2M Attempted Marks">{{perf.2m_attempted_m|floatformat:2 }}</span>)</span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Total Marks</td>
+                                    <td>
+                                        {{ exam.total_marks|floatformat:2 }}
+                                        <span class="text-muted fs-6">(<span title="1M Total Marks">{{perf.1m_total_m|floatformat:0 }}</span> + <span title="2M Total Marks">{{perf.2m_total_m|floatformat:0 }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold">Correct Marks:</span>
-                            <span class="text-info">{{perf.total_correct_m|floatformat:2 }}</span>
-                            <span class="text-muted fs-6">
-                                (<span title="1M Correct Marks">{{perf.1m_correct_m|floatformat:2 }}</span> +
-                                <span title="2M Correct Marks">{{perf.2m_correct_m|floatformat:2 }}</span>)
-                            </span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Attempted Marks</td>
+                                    <td>
+                                        {{ perf.total_attempted_m|floatformat:2 }}
+                                        <span class="text-muted fs-6">(<span title="1M Attempted Marks">{{perf.1m_attempted_m|floatformat:0 }}</span> + <span title="2M Attempted Marks">{{perf.2m_attempted_m|floatformat:0 }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold">Skipped Marks:</span>
-                            <span class="text-info text-muted">{{perf.total_skipped_m|floatformat:2 }}</span>
-                            <span class="text-muted fs-6">
-                                (<span title="1M Correct Marks">{{perf.1m_skipped_m|floatformat:2 }}</span> +
-                                <span title="2M Correct Marks">{{perf.2m_skipped_m|floatformat:2 }}</span>)
-                            </span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Skipped Marks</td>
+                                    <td>
+                                        <span class="text-info text-muted">{{perf.total_skipped_m|floatformat:2 }}</span>
+                                        <span class="text-muted fs-6">(<span title="1M Skipped Marks">{{perf.1m_skipped_m|floatformat:0 }}</span> + <span title="2M Skipped Marks">{{perf.2m_skipped_m|floatformat:0 }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold">Penalty:</span>
-                            <span class="text-danger fw-semibold">-{{ perf.total_penalty_m|floatformat:2}}</span>
-                            <span class="text-muted fs-6">
-                                (<span title="1M Penalty">{{ perf.1m_penalty_m|floatformat:2}}</span> +
-                                <span title="2M Penalty">{{ perf.2m_penalty_m|floatformat:2}}</span>)
-                            </span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Correct Marks</td>
+                                    <td>
+                                        <span class="text-info">{{perf.total_correct_m|floatformat:2 }}</span>
+                                        <span class="text-muted fs-6">(<span title="1M Correct Marks">{{perf.1m_correct_m|floatformat:0 }}</span> + <span title="2M Correct Marks">{{perf.2m_correct_m|floatformat:0 }}</span>)</span>
+                                    </td>
+                                </tr>
 
-                        <div>
-                            <span class="fw-semibold">Resultant Marks:</span>
-                            <span class="text-success">{{perf.total_resultant_m|floatformat:2 }}</span>
-                            <span class="text-muted fs-6">
-                                (<span title="1M Resultant Marks">{{perf.1m_resultant_m|floatformat:2 }}</span> +
-                                <span title="2M Resultant Marks">{{perf.2m_resultant_m|floatformat:2 }}</span>)
-                            </span>
-                        </div>
+                                <tr>
+                                    <td class="fw-semibold ps-0">Penalty</td>
+                                    <td>
+                                        <span class="text-danger fw-semibold">-{{ perf.total_penalty_m|floatformat:2}}</span>
+                                        <span class="text-muted fs-6">(<span title="1M Penalty">{{ perf.1m_penalty_m|floatformat:2}}</span> + <span title="2M Penalty">{{ perf.2m_penalty_m|floatformat:2}}</span>)</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="fw-semibold ps-0">Resultant Marks</td>
+                                    <td>
+                                        <span class="text-success fw-semibold fs-4">{{perf.total_resultant_m|floatformat:2 }}</span>
+                                        <span class="text-muted fs-6">(<span title="1M Resultant Marks">{{perf.1m_resultant_m|floatformat:2 }}</span> + <span title="2M Resultant Marks">{{perf.2m_resultant_m|floatformat:2 }}</span>)</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
 
                     </div>
@@ -290,6 +314,67 @@ Result: {{exam.display_title}}
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card p-4 shadow-sm h-100">
+                    <h4 class="mb-4">Subject Wise Breakdown</h4>
+                    <table class="table table-striped table-hover align-middle mb-0 rounded-1">
+                        <thead>
+                            <td><b>Category</b></td>
+                            <td><b>Questions</b></td>
+                            <td><b>Attempted</b></td>
+                            <td><b>Correct</b></td>
+                            <td><b>Accuracy %</b></td>
+                            <td><b>Score %</b></td>
+                            <td><b>Marks Earned/ Max Marks</b></td>
+                        </thead>
+                        {% for category, data in subject_wise_break_down.items %}
+                            <tr>
+                                <td class="fw-bold">{{category}}</td>
+                                <td>{{data.count}}</td>
+                                <td>{{data.total_attempts}}</td>
+                                <td>{{data.total_correct}}</td>
+                                <td class="{{data.accuracy_class}} fw-semibold">{{data.overall_accuracy|floatformat:2}}</td>
+                                <td class="{{data.score_class}} fw-semibold">{{data.score|floatformat:2}}</td>
+                                <td>{{data.marks_scored|floatformat:2}}/{{data.total_marks|floatformat:0}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card p-4 shadow-sm h-100">
+                    <h4 class="mb-4">Pool Wise breakdown</h4>
+                        <table class="table table-striped table-hover align-middle mb-0 rounded-1">
+                            <thead>
+                                <td><b>Pool</b></td>
+                                <td><b>Subject</b></td>
+                                <td><b>Questions</b></td>
+                                <td><b>Attempted</b></td>
+                                <td><b>Correct</b></td>
+                                <td><b>Accuracy %</b></td>
+                                <td><b>Score %</b></td>
+                                <td><b>Marks Earned/ Max Marks</b></td>
+                            </thead>
+                            {% for category, data in pooled_data.items %}
+                                <tr>
+                                    <td class="fw-bold">{{category}}</td>
+                                    <td style="width: 30%;">{{data.subjects}}</td>
+                                    <td>{{data.count}}</td>
+                                    <td>{{data.total_attempts}}</td>
+                                    <td>{{data.total_correct}}</td>
+                                    <td class="{{data.accuracy_class}} fw-semibold">{{data.overall_accuracy|floatformat:2}}</td>
+                                    <td class="{{data.score_class}} fw-semibold">{{data.score|floatformat:2}}</td>
+                                    <td>{{data.marks_scored|floatformat:2}}/{{data.total_marks|floatformat:0}}</td>
+                                </tr>
+                            {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -314,7 +399,11 @@ Result: {{exam.display_title}}
                 <div class="d-flex justify-content-between align-items-start mb-2">
                     <div class="d-flex gap-2 align-items-center flex-wrap">
                         <!-- <span class="oval-pill">Q{{ eq.original_order|default:forloop.counter }}</span> -->
-                        <span class="oval-pill">Q{{ forloop.counter }}</span>
+                        <span class="oval-pill">
+                            <a class="text-decoration-none text-reset" href="{% url 'view_question' eq.question_id %}">
+                                Q{{ forloop.counter }}
+                            </a>
+                        </span>
                         <span class="pill-small custom-bg-dark fs-6">{{ eq.question.q_type }}</span>
                         <span class="pill-small custom-bg-dark fs-6">Award: {{ eq.question.marks_award }}</span>
                         <span class="pill-small custom-bg-dark fs-6">
@@ -322,7 +411,7 @@ Result: {{exam.display_title}}
                         <span class="pill-small custom-bg-dark fs-6">{{ eq.question.category }}</span>
                     </div>
 
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" title="Copy question text"
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" title="Copy question text" data-user-answer="{{eq.user_ans}}"
                         data-qid="{{ eq.question.q_id }}">📄</button>
                 </div>
                 {% if eq.accuracy_percent %}
@@ -348,7 +437,7 @@ Result: {{exam.display_title}}
                         Status: {{ eq.ans_status }}
                     </div>
                     <div class="pill-small custom-bg-dark">
-                        Time: {{ eq.formtted_time_taken }}
+                        Time: <span class="{{eq.time_taken_class}}">{{ eq.formatted_time_taken }}</span>
                     </div>
                     <div>
                         <a target="_blank" class="btn-custom pill-small"

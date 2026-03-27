@@ -3,14 +3,16 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from .test_series_parser import process_package_upload
-from .models import TestPackage, Exam, User, Question, Attempt
+from .models import TestPackage, Exam, User, Question, Attempt, ExamQuestion
 import re
 from django.conf import settings
-from .helper import time_mins_to_hour_mins, calculate_attempt_performance
+from .helper import time_mins_to_hour_mins, calculate_attempt_performance, replace_question_image_link
 from .attempt_parser import process_attempts_upload
 from django.http import JsonResponse, HttpResponseNotFound
 import json
 from django.shortcuts import get_object_or_404
+from .config import *
+from django.db.models import Prefetch
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -280,7 +282,7 @@ def results_view(request, attempt_id):
                 eq.question.question_html
             )
 
-    perf, sections, total_marks_obtained = calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
+    perf, sections, total_marks_obtained, subject_wise_break_down, pooled_data = calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
 
     time_unutilised_mins = exam.duration_mins - (attempt.time_taken_mins or 0)
     try:
@@ -294,7 +296,7 @@ def results_view(request, attempt_id):
     medal_title = ''
     if perf['percentile'] >= 90:
         medal = '🏆'
-        medal_title = "ACE"
+        medal_title = "ACE - Enter top 10%"
     if total_marks_obtained > (exam.highest_marks or 0):
         medal = '🥇 🏆'
         medal_title = "CONQUEROR"
@@ -309,7 +311,9 @@ def results_view(request, attempt_id):
         'perf': perf,
         'time_unutilised_mins': time_unutilised_mins,
         'medal': medal,
-        'medal_title': medal_title
+        'medal_title': medal_title,
+        'subject_wise_break_down' : subject_wise_break_down,
+        'pooled_data': pooled_data
     }
     
     return render(request, 'exams/results_view.html', context)
