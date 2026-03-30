@@ -25,6 +25,8 @@ class User(AbstractBaseUser):
     phone = models.CharField(max_length=15, null=True, blank=True)
     profile_image_link = models.TextField(null=True, blank=True)
 
+    birthdate = models.DateField(null=True, blank=True)
+
     # Required for Django admin/auth compatibility
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -35,6 +37,13 @@ class User(AbstractBaseUser):
     # username is now the login field
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['full_name']
+
+    @property
+    def login_bd(self):
+        """Returns the birthdate in DDMMYYYY format for GATE mock test authentication."""
+        if self.birthdate:
+            return self.birthdate.strftime('%d%m%Y')
+        return None
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser

@@ -39,13 +39,14 @@ def register_view(request):
         username = request.POST.get('username')
         full_name = request.POST.get('full_name')
         password = request.POST.get('password')
+        birthdate = request.POST.get('birthdate')
         
         # Basic validation
         if User.objects.filter(username=username).exists():
             return render(request, 'exams/register.html', {'error': 'Username already exists.'})
             
         # create_user automatically hashes the password thanks to our UserManager
-        user = User.objects.create_user(username=username, password=password, full_name=full_name)
+        user = User.objects.create_user(username=username, password=password, full_name=full_name, birthdate = birthdate)
         login(request, user)
         return redirect('home')
         
