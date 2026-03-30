@@ -13,6 +13,7 @@ import json
 from django.shortcuts import get_object_or_404
 from .config import *
 from django.db.models import Prefetch
+import os
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -40,13 +41,33 @@ def register_view(request):
         full_name = request.POST.get('full_name')
         password = request.POST.get('password')
         birthdate = request.POST.get('birthdate')
-        
-        # Basic validation
+        photo = request.FILES.get('candidate_photo')
+
         if User.objects.filter(username=username).exists():
             return render(request, 'exams/register.html', {'error': 'Username already exists.'})
             
-        # create_user automatically hashes the password thanks to our UserManager
-        user = User.objects.create_user(username=username, password=password, full_name=full_name, birthdate = birthdate)
+        user = User.objects.create_user(
+            username=username, 
+            password=password, 
+            full_name=full_name, 
+            birthdate=birthdate
+        )
+        
+        if photo:
+            ext = os.path.splitext(photo.name)[1]
+            filename = f"{user.user_id}{ext}"
+            
+            save_dir = os.path.join(settings.BASE_DIR, 'static', 'candidate_profile_images')
+            os.makedirs(save_dir, exist_ok=True)
+            file_path = os.path.join(save_dir, filename)
+            
+            with open(file_path, 'wb+') as destination:
+                for chunk in photo.chunks():
+                    destination.write(chunk)
+                    
+            user.candidate_photo = filename
+            user.save()
+        
         login(request, user)
         return redirect('home')
         

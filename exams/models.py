@@ -23,7 +23,7 @@ class User(AbstractBaseUser):
     full_name = models.CharField(max_length=100)
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=15, null=True, blank=True)
-    profile_image_link = models.TextField(null=True, blank=True)
+    candidate_photo = models.CharField(max_length=255, null=True, blank=True)
 
     birthdate = models.DateField(null=True, blank=True)
 
