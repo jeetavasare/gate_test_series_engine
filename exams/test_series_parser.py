@@ -193,3 +193,150 @@ def process_package_upload(package_code, package_name, access_page_file, results
         "questions_processed": len(questions_dict),
         "skipped_exam_ids": list(skipped_ids)
     }
+
+
+def process_pyq_package_upload(package_code, package_name, results_file, cs_tests_file):
+    results_data = json.load(results_file)
+    cs_tests_data = json.load(cs_tests_file)
+
+    # 1. Map CS Tests (New Source of Truth for Structure)
+    cs_tests_map = {int(obj['exam_id']): obj for obj in cs_tests_data}
+
+    # 2. Map GATE Mocks (Results/Stats/Heatmaps)
+    mocks_map = {}
+    for obj in results_data:
+        exam_id = int(obj['exam_id'])
+        info = obj.get('exam_info', {})
+        
+        # Extract Heat Map Data
+        heat_map_dict = {}
+        for hm in obj.get('heat_map', []):
+            href = hm.get('href', '')
+            hm_match = re.search(r'\.\./(\d+)/', href)
+            if hm_match:
+                hm_q_id = int(hm_match.group(1))
+                
+                title_str = hm.get('original-title', '')
+                
+                order_match = re.search(r'Question\s*:\s*(\d+)', title_str)
+                order_val = int(order_match.group(1)) if order_match else None
+                
+                acc_match = re.search(r'Accuracy:\s*(\d+)%', title_str)
+                acc_val = int(acc_match.group(1)) if acc_match else None
+
+                heat_map_dict[hm_q_id] = {
+                    'original_order': order_val,
+                    'accuracy_percent': acc_val,
+                    'color': hm.get('style_background_color', '')
+                }
+
+        mocks_map[exam_id] = {
+            'avg_marks': info.get('avg._mark'),
+            'top_10_avg_marks': info.get('avg._mark_of_top_10'),
+            'highest_marks': info.get('highest_mark'),
+            'toppers': obj.get('toppers', []),
+            'heat_map': heat_map_dict,
+            'total_takes': info.get('total_takes', 0),
+        }
+
+    # Intersections
+    valid_exam_ids = set(cs_tests_map.keys()).intersection(mocks_map.keys())
+    skipped_ids = set(cs_tests_map.keys()).union(mocks_map.keys()) - valid_exam_ids
+
+    # Transaction Block
+    with transaction.atomic():
+        package, _ = TestPackage.objects.get_or_create(code=package_code, defaults={'name': package_name})
+
+        exams_to_create = []
+        questions_dict = {}
+        exam_questions_to_create = []
+
+        for eid in valid_exam_ids:
+            cs_data = cs_tests_map[eid]
+            mock_data = mocks_map[eid]
+
+            exam = Exam(
+                exam_id=eid,
+                title=cs_data.get('name', f"Exam {eid}"),
+                sec_exam_title=None, 
+                topics=None,
+                created_date=None,
+                duration_mins=int(cs_data.get('duration', 0)),
+                total_marks=float(cs_data.get('total_marks', 0)),
+                total_questions=int(cs_data.get('total_qs', 0)),
+                total_takes=mock_data.get('total_takes', 0),
+                avg_marks=mock_data.get('avg_marks'),
+                top_10_avg_marks=mock_data.get('top_10_avg_marks'),
+                highest_marks=mock_data.get('highest_marks')
+            )
+            exams_to_create.append(exam)
+
+            for section in cs_data.get('section', []):
+                for q in section.get('question', []):
+                    q_id = int(q['post_id'])
+                    
+                    if q_id not in questions_dict:
+                        questions_dict[q_id] = Question(
+                            q_id=q_id,
+                            q_type=q.get('type', ''),
+                            category=q.get('category', ''),
+                            tags=q.get('tags', ''),
+                            question_html=q.get('text', ''),
+                            correct_answer=str(q.get('answer', '')).upper(),
+                            marks_award=float(q.get('award', 0)),
+                            marks_penalty=float(q.get('penalty', 0))
+                        )
+                    
+                    hm_data = mock_data['heat_map'].get(q_id, {})
+                    
+                    exam_questions_to_create.append(ExamQuestion(
+                        exam_id=eid,
+                        question_id=q_id,
+                        original_order=hm_data.get('original_order'),
+                        accuracy_percent=hm_data.get('accuracy_percent'),
+                        heat_map_color=hm_data.get('color', '')
+                    ))
+
+        # 1. Create exams
+        Exam.objects.bulk_create(exams_to_create, ignore_conflicts=True)
+        
+        # 2. Link package
+        exams_in_db = Exam.objects.filter(exam_id__in=valid_exam_ids)
+        package.exams.add(*exams_in_db)
+
+        # 3. Create Questions and Junctions
+        Question.objects.bulk_create(questions_dict.values(), ignore_conflicts=True)
+        ExamQuestion.objects.bulk_create(exam_questions_to_create, ignore_conflicts=True)
+
+        # 4. Toppers
+        toppers_dict = {}
+        exam_toppers_to_create = []
+
+        for eid in valid_exam_ids:
+            for t_data in mocks_map[eid]['toppers']:
+                profile_link = t_data.get('profile_link', '')
+                username = profile_link.rstrip('/').split('/')[-1] if profile_link else t_data.get('name', 'unknown').replace(' ', '_')
+
+                if username not in toppers_dict:
+                    toppers_dict[username] = Topper2026(
+                        username=username,
+                        name=t_data.get('name', ''),
+                        profile_link=profile_link
+                    )
+
+                exam_toppers_to_create.append(ExamTopper(
+                    exam_id=eid,
+                    topper_id=username,
+                    marks=t_data.get('marks', 0),
+                    time_taken_mins=t_data.get('time_taken', 0)
+                ))
+
+        Topper2026.objects.bulk_create(toppers_dict.values(), ignore_conflicts=True)
+        ExamTopper.objects.bulk_create(exam_toppers_to_create, ignore_conflicts=True)
+
+    return {
+        "success": True,
+        "exams_processed": len(valid_exam_ids),
+        "questions_processed": len(questions_dict),
+        "skipped_exam_ids": list(skipped_ids)
+    }

@@ -1,0 +1,107 @@
+{% extends 'exams/centered_template.html' %}
+
+{% load static %}
+
+
+
+{% block page_title %}
+Exam : {{exam.display_title}}
+{% endblock %}
+
+{% block page_content %}
+
+<div class="mb-2">
+    <h2 class="mb-1">{{ exam.display_title }}</h2>
+    <p class="text-muted fs-5 mb-2"><b>Topics:</b> {{ exam.topics|default:"Not specified" }}</p>
+
+    <div class="d-flex flex-wrap gap-3 text-muted mb-4">
+        <span><b>Exam Release Date:</b>
+            <span class="format-date" data-date="{{ exam.created_date }}">{{ exam.created_date }}</span></span>
+        <span>|</span>
+        <span><b>Duration:</b> {{ formatted_duration }}
+            {% if "hr" in formatted_duration %}
+            ({{ exam.duration_mins }} mins)
+            {% endif %}
+        </span>
+        <span>|</span>
+        <span><b>Total Questions:</b> {{ exam.total_questions }}</span>
+        <span>|</span>
+        <span><b>Total Marks:</b> {{ exam.total_marks|floatformat:0 }}</span>
+    </div>
+
+</div>
+
+<hr class="mt-3 mb-4" style="border-color: var(--border-color);">
+
+
+<div class="card p-4 shadow-sm mt-4">
+    <h4 class="mb-3">Exam Configuration</h4>
+    <form id="examConfigForm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Exam Mode</h5>
+                <div class="form-check" style="cursor: pointer;">
+                    <label class="form-check-label" for="modeTest" style="cursor: pointer;">
+                        <input class="form-check-input" type="radio" name="examMode" id="modeTest" value="test" checked>
+                        Test
+                        <p class="text-muted">Exam Starts IMMEDIATELY, Skips login & instructions step</p>
+                    </label>
+                </div>
+                <div class="form-check" >
+                    <label class="form-check-label" for="modeSimulation" style="cursor: pointer;">
+                        <input class="form-check-input" type="radio" name="examMode" id="modeSimulation" value="simulation">
+                        Simulation
+                        <p class="text-muted">Exam proceeds as per set schedule and login with registrtation number and DOB after which instructions page will be presented</p>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <h5>Interface Behavior</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="interfaceBehavior" id="behaviorComfort"
+                        value="test" checked>
+                    <label class="form-check-label" for="behaviorComfort">
+                        Normal 
+                        <p class="text-muted">No shuffling, Allows early submit, Mouse scroll works, No question switch delay</p>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="interfaceBehavior" id="behaviorSimulation"
+                        value="simulation">
+                    <label class="form-check-label" for="behaviorSimulation">
+                        Simulation
+                        <p class="text-muted">Shuffling, No early submitting, Mouse scroll disabled, Question switch delay</p>
+                    </label>
+                </div>
+            </div>
+
+            <div id="simulationTimeControls" class="d-none border-top pt-3 mt-2">
+                <h5 class="mb-3">Set Exam Schedule</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h6>Session Start Time</h6>
+                        <small class="text-muted d-block mb-1">When candidate can log in</small>
+                        <input type="datetime-local" id="sessionStartTime" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6>Exam Start Time</h6>
+                        <small class="text-muted d-block mb-1">When 'Begin Exam' unlocks (dictates duration of instruction page)</small>
+                        <input type="datetime-local" id="examStartTime" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" data-exam-id="{{ exam.exam_id }}" class="btn btn-primary mt-3" id="startExamBtn">Start
+            Exam</button>
+    </form>
+</div>
+
+
+{% endblock %}
+
+{% block end_js %}
+<script src="{% static 'js/exam_prep.js' %}"></script>
+<script src="{% static 'js/auto_format_date.js' %}"></script>
+{% endblock %}

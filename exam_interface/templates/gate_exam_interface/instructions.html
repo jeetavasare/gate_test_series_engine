@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<!-- saved from url=(0073)https://cdn4.digialm.com//OnlineAssessment/instructions.html?585@@M464@@0 -->
+<html>
+
+<head>
+	<base href="/static/exam_interface/">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<meta content="IE=edge" http-equiv="X-UA-Compatible">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Instructions - Assessment Examination Center</title>
+
+	<link rel="stylesheet" type="text/css" href="css/mock_style.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<!-- <link rel="stylesheet" type="text/css" href="css/keyboard.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="css/number_style.css"> -->
+	<link rel="stylesheet" type="text/css" href="css/aecInstructions.css">
+	<script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+	<!-- <script type="text/javascript" src="js/jquery.cookie.js"></script> -->
+	<!-- <script type="text/javascript" src="js/keyboard.js"></script> -->
+	<!-- <script type="text/javascript" src="js/jquery.actual.min.js"></script> -->
+	<script type="text/javascript" src="js/bean.js"></script>
+	<!-- <script type="text/javascript" src="js/variableinitialiserfortop.js"></script> -->
+	<!-- <script type="text/javascript" src="js/cacheFiles.js"></script> -->
+	<link href="css/font-awesome.min.css" rel="stylesheet">
+	<!-- <script type="text/javascript" src="js/text-to-speech.js"></script> -->
+	<!-- <script type="text/javascript" src="js/accessibilityQuiz.js"></script> -->
+	<!-- <script type="text/javascript" src="js/top.js"></script> -->
+	<!-- <script type="text/javascript" src="js/candidateconsolechanges.js"></script> -->
+	<!-- <script type="text/javascript" src="js/RightToLeft.js"></script> -->
+	<!-- <script type="text/javascript" src="js/popupwindow.js"></script> -->
+	<link rel="stylesheet" type="text/css" href="css/jcarousel.connected-carousels.css">
+	<link rel="stylesheet" type="text/css" href="css/popupwindow.css">
+	<script type="text/javascript" src="js/jquery.jcarousel.min.js"></script>
+	<script type="text/javascript" src="js/jcarousel.connected-carousels.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
+	<!-- <script src="js/commonThemes.js"></script> -->
+	<!-- <script src="js/thickbox-compressed.js"></script> -->
+
+
+
+	<!-- MY SCRIPTS -->
+    <script src="/static/js/context_fetcher.js"></script>
+    <script src="/static/js/gate_instructions.js"></script>
+
+
+	<script>
+
+
+		function showId() {
+			if (mockVar.storeCandResponse == 1 || isOfflineIBA)
+				maintainReadyAudit();
+			var url = document.URL;
+			var orgId = "";
+			var mockId = "";
+			var attemptId = "";
+			var candMasterId = "";
+			var authenticationKey = "";
+			if (url.indexOf("instructions.html?") >= 0) {
+				var params = url.split("instructions.html?");
+				orgId = $.trim(params[1]).split("@@")[0];
+				mockId = $.trim(params[1]).split("@@")[1];
+				attemptId = $.trim(params[1]).split("@@")[2];
+				candMasterId = "";
+				authenticationKey = $.trim(params[1]).split("@@")[5];
+				if (mockVar.storeCandResponse == 1) {
+					candMasterId = $.trim(params[1]).split("@@")[3];
+					if (candMasterId != undefined && candMasterId.indexOf("#") > -1) {
+						candMasterId = candMasterId.substring(0, candMasterId.indexOf("#"));
+					}
+				}
+				if (typeof (attemptId) != 'undefined' && attemptId.indexOf("#") > -1) {
+					attemptId = attemptId.substring(0, attemptId.indexOf("#"));
+				}
+				if (typeof (mockId) != 'undefined' && mockId.indexOf("#") > -1) {
+					mockId = mockId.substring(0, mockId.indexOf("#"));
+				}
+
+				if (typeof (authenticationKey) != 'undefined' && authenticationKey.indexOf("#") > -1) {
+					authenticationKey = authenticationKey.substring(0, authenticationKey.indexOf("#"));
+				}
+			} else {
+				mockId = $.cookie("assessmentId") == undefined ? sessionStorage.assessmentId : $.cookie("assessmentId");
+			}
+			isAuthenticationRequired = false;
+			if (mockId != undefined ? (mockId.indexOf("M") >= 0) : false) {
+				announcePageLoading("Remote Assessment Page");
+				//window.location.href="quiz.html?"+orgId+"@@"+mockId+"@@"+attemptId+"@@"+candMasterId+"@@"+0+"@@"+authenticationKey;
+				if (sessionStorage.isPaperUI == 1) {
+					setTimeout(function () { window.open("/OnlineAssessment/quiz.html?" + orgId + "@@" + mockId + "@@0@@0@@0@@0", "_self"); }, 50);
+				}
+
+				else
+					setTimeout(function () { window.location.href = "quiz.html?" + orgId + "@@" + mockId + "@@0@@0@@0@@0"; }, 50);
+
+
+			}
+			else {
+				announcePageLoading("Remote Assessment Page");
+				if (!isProofReadingMock && !isOfflineIBA)
+					setTimeout(function () { window.location.href = document.URL.replace("instructions", "quiz"); }, 50);
+
+
+				else
+					setTimeout(function () { window.location.href = "quiz.html?" + url.split("instructions.html?")[1]; }, 50);
+
+
+			}
+			//window.location.href="quiz.html?"+orgId+"@@"+mockId+"@@"+attemptId+"@@"+candMasterId+"@@"+0;
+		}
+
+		var page = "next";
+		function showInstr() {
+			if (page == "next") {
+				$('#iframeId').contents().find("#firstPage").hide();
+				$('#iframeId').contents().find("#secondPagep1").show();
+				$("#secondPagep2").show();
+				page = "previous";
+				$("#instPagination").hide();
+				$("#previousbtn").text(mockLabels.previous);
+				$("#instruction").removeClass("sysInstruLabel");
+				$("#instruction").text("Other Important Instructions");
+				$("#instruction").addClass("otherInstruLabel");
+				$('#PreviousInst').show();
+				$('#readylink').show();
+				// loadInstruLabels();
+
+
+			} else if (page == "previous") {
+				$('#iframeId').contents().find("#secondPagep1").hide();
+				$("#secondPagep2").hide();
+				$('#iframeId').contents().find("#firstPage").show();
+				page = "next";
+				$("#instPagination").show();
+				$('#PreviousInst').hide();
+				$('#readylink').hide();
+				$("#nextTxt").text(mockLabels.next);
+				$("#instruction").removeClass("otherInstruLabel");
+				$("#instruction").text("Instructions");
+				$("#instruction").addClass("sysInstruLabel");
+				// loadInstruLabels();
+
+			}
+			//sreejith
+			if ($('#iframeId').contents().find('#basInst option:selected').val().indexOf('sysInstText') > -1)
+				langId = $('#iframeId').contents().find('#basInst option:selected').val().split('sysInstText')[1];
+			if (sessionStorage.enableVoiceOver === 'YES' || mockVar.enableVoiceOver === 'YES') {
+				formVoiceOverTextForInstruPageHtml(langId);
+			}
+			// setInstruHeights();
+		}
+
+
+
+		function newReadyToBegin() {
+			var check;
+			var orgId = sessionStorage.orgId;
+			var assessmentId = sessionStorage.assessmentId;
+			var attemptIds = sessionStorage.attemptId;
+			var candMasterId = sessionStorage.cand_master_id;
+			var assessmentIndex = sessionStorage.assessmentIndex;
+			var isOnlineCheck = sessionStorage.isofflineOnline;
+			if (isOnlineCheck == "1") {
+				if (document.getElementById('isOfflineOnline').value == "YES") {
+					check = 1;
+				}
+				else if (document.getElementById('isOfflineOnline').value == "NO") {
+					check = 0;
+				}
+				sessionStorage.isofflineOnlineSelected = check;
+				if (check == 1 || check == 0) {
+					var URL = "/IBA/IBAFiles.do?action=saveIsOfflineOnline&orgId=" + orgId + "&assessmentId=" + assessmentId + "&attemptIds=" + attemptIds + "&candMasterId=" + candMasterId + "&assessmentIndex" + assessmentIndex + "&check=" + check;
+					$.ajax({
+						url: URL,
+						type: 'POST',
+						data: 'text',
+						async: false,
+						success: function (data) {
+							if (data == 'success' || data == 'failure') {
+								readyToBegin();
+							}
+						}
+					});
+				}
+			}
+			else {
+				readyToBegin();
+			}
+
+		}
+
+
+		function readyToBegin(timeout) {
+			if (sessionStorage.assessmentMode == "2") caches.delete(cacheName).then(function () { console.log("cache deleted!!"); }).catch(function () { console.log("Failed to delete cache"); });
+			if (document.getElementById("defaultLanguage").options.length > 2) {
+				var lang = document.getElementById("defaultLanguage");
+				if (lang.value != '0') {
+					createDefaultSubject(lang.value);
+				} else if (timeout) {
+					createDefaultSubject(document.getElementById("defaultLanguage").options[1].value);
+				} else {
+					cnfPop('InfoPopup');
+					//trapFocusinInfo();
+					// $("#infoMsg2").html("Please choose your default language.");
+					$("#infoMsg2").text(mockLabels.chooseDefaultLangErr);
+					return false;
+				}
+			} else {
+				try {
+					createDefaultSubject(document.getElementById("defaultLanguage").options[1].value);
+				} catch (e) {
+
+				}
+			}
+			if (document.getElementById("disclaimer").checked == true || sessionStorage.userDefinedNum === "schoolUI") {
+				document.getElementById("readylink").removeAttribute("disabled", 0);
+				showId();
+			} else {
+				cnfPop('InfoPopup');
+				//trapFocusinInfo();
+				//$("#infoMsg2").html('Please accept terms and conditions before proceeding.');
+				$("#infoMsg2").text(mockLabels.acceptDisclaimerMessage);
+				document.getElementById("readylink").disabled = "disabled";
+				//$("#readylinkButton").attr("role","link");
+				//$("#readylinkButton").attr("tabindex","-1");
+				//$("#readylink").attr("role","presentation");
+				$("#readylink").attr("tabindex", "-1");
+				return false;
+			}
+		}
+
+		function linkDisp() {
+			if (document.getElementById("disclaimer").checked == true || sessionStorage.userDefinedNum === "schoolUI") {
+				document.getElementById("readylink").removeAttribute("disabled", 0);
+				$("#readylink").attr("aria-disabled", "false");
+				//$("#readylink").attr("tabindex","0").attr("role","link");
+				$("#readylink").attr("tabindex", "0");
+			} else {
+				document.getElementById("readylink").disabled = "disabled";
+				$("#readylink").attr("disabled", "disabled");
+				$("#readylink").attr("aria-disabled", "true");
+				$("#readylink").attr("tabindex", "-1");
+			}
+		}
+
+
+
+		function onLoadEssentials() {
+			setTimeout(function () {
+				$('#instruction').css('outline', 'none');
+				$('#instruction').focus();
+			}, 2000)
+
+			setTimeout(function () {
+				$('#commonPageInstruction').attr('aria-hidden', 'false');
+				$('.readyBeginFooter').attr('aria-hidden', 'false');
+				$('#mainright').attr('aria-hidden', 'false');
+			}, 2500)
+		}
+
+		$(document).on('click', '.pop-up-close-triggerfull', function () {
+			var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+			if (isSafari) {
+				$(document).on('click', '.pop-up-close-triggerfull', function () {
+					alert("Safari browser detected");
+					$('.pop-up-background pop-up-background-modal').css('display', 'none');
+					$('.carousel').remove();
+					$('.pop-up-header').remove();
+					$('.pop-up-content').remove();
+					$('.pop-up').remove();
+					$('.connected-carousels').remove();
+				});
+			}
+			$(".headergrup").removeClass("fullzoom");
+			$(".btntab").removeClass("fullzoom");
+			$(".Rght_Section").removeClass("fullzoom");
+			$(".profile-grouping-section").removeClass("fullzoom");
+			$(".questiontype-markpanel").removeClass("fullzoom");
+			$("#Questn_Innr_Div_section").removeClass("fullzoom");
+			$(".buttons-div").removeClass("fullzoom");
+			$("#footer").removeClass("fullzoom");
+			$(".Ans_Area").removeClass("zoomscreen");
+			/* To exit Full Screen */
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.webkitExitFullscreen) {
+				document.webkitExitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+				document.mozCancelFullScreen();
+			} else if (document.msExitFullscreen) {
+				document.msExitFullscreen();
+			} else {
+				var shell = new ActiveXObject("WScript.Shell");
+				shell.SendKeys("{F11}");
+			}
+			$(".maximizeicon").show();
+			resetCarousel();
+			$(".connected-carousels .carousel li img").removeClass("fullzoomimg");
+		});
+		$(document).ready(function () {
+			var btn = document.getElementsByClassName('maximizeicon');
+			$('.maximizeicon').on('click', function () {
+				var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+				var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+				if (isSafari) {
+					$('.pop-up-close-triggerfull').css('visibility', 'hidden');
+					$('.pop-up-header').css('visibility', 'hidden');
+					$('.pop-up-close-trigger').css('margin-top', '30px');
+					$('.pop-up-close-trigger').css('margin-right', '10px');
+					$('.pop-up-close-trigger').css('background-color', 'black');
+					$('.navigation').css('visibility', 'hidden');
+					$('.prev').css('margin-left', '-20px');
+					$('.next').css('margin-right', '-20px');
+					if ($(window).width() < 769) {
+						$('.connected-carousels ul li img').height(auto);
+					}
+					if ($(window).width() < 381) {
+						$('.connected-carousels img').height(auto);
+					}
+				}
+			});
+			if (document.addEventListener) {
+				document.addEventListener('webkitfullscreenchange', exitHandler, false);
+				document.addEventListener('mozfullscreenchange', exitHandler, false);
+				document.addEventListener('fullscreenchange', exitHandler, false);
+				document.addEventListener('MSFullscreenChange', exitHandler, false);
+			}
+		});
+		function exitHandler() {
+			if (document.webkitIsFullScreen === false) {
+				resetCarousel();
+			}
+			else if (document.mozFullScreen === false) {
+				resetCarousel();
+			}
+			else if (document.msFullscreenElement === false) {
+				resetCarousel();
+			}
+		}
+		function resetCarousel() {
+			/* if($(window).width()> 768){
+				$('#pop-up').css('top','64px').css('left','50%').css('margin-left','-350px').css('max-width','700px').css('width','90%');
+				$('.connected-carousels').css('padding','20px 0px 15px');
+				$('.pop-up-content').css('padding','24px');
+				$('#stage').css('width', '620px');
+			}
+			else if($(window).width()< 768){
+				$('#stage').css('width', 'auto');
+			} */
+			/*$('.connected-carousels .prev-stage, .connected-carousels .next-stage').css('height','410px');*/
+
+			$('.carousel-stage').css('height', '400px');
+			$('.connected-carousels .prev-stage, .connected-carousels .next-stage').removeClass('fullsn');
+			$('.connected-carousels ul li img').css('height', '400px').css('width', '630px');
+			$('#stage .pop-up-close-triggerfull').remove();///fire your event
+			$('.maximizeicon, .pop-up-header, .connected-carousels .navigation, .pop-up-close-trigger').show();
+			if (hasNavigationBar) {
+				$('.navigation').show();
+			} else {
+				$('.navigation').hide();
+			}
+			if (isUsefullDataMedia) {
+				$('.maximizeicon').hide();
+			} else {
+				$('.maximizeicon').show();
+
+			}
+		}
+
+		function readSysInstructionsXMLInstPage(xml, orgId, mockId) {
+			var langId = 1;
+			try {
+				var referenceDocumentReq = $(xml).find("Referencedocument").text();
+				var pageToView = $(xml).find("PagesToUploadrefDoc").text();
+				var pageToViewArr = pageToView.split(",");
+				if (referenceDocumentReq == "YES" && $.inArray("1", pageToViewArr) != -1)
+					$("#refdocDivinstru").show();
+				mockVar.referenceDocDownload = $(xml).find("ReferencedocumentDownload").text() == "YES" ? 1 : 0;
+				mockVar.referenceDoc = $(xml).find("ReferenceDocumentpath").text()
+			} catch (e) { }
+			mockVar.mockCandidateName = $(xml).find("CandidateName").text();
+			if (typeof (sessionStorage.xmlFilePath) != "undefined")
+				xmlFilePath = sessionStorage.xmlFilePath;
+			if (typeof (sessionStorage.isProofReadingMock) != "undefined")
+				isProofReadingMock = sessionStorage.isProofReadingMock;
+			if (typeof (sessionStorage.proofReadingConfigPath) != "undefined")
+				proofReadingConfigPath = sessionStorage.proofReadingConfigPath;
+			if (typeof (sessionStorage.proofReadingQpPath) != "undefined")
+				proofReadingQpPath = sessionStorage.proofReadingQpPath;
+
+			if (typeof (sessionStorage.isOfflinePaper) != "undefined")
+				isOfflineIBA = sessionStorage.isOfflinePaper == '1' ? true : false;
+			if (typeof (sessionStorage.offlineIBAConfigPath) != "undefined")
+				offlineIBAConfigPath = sessionStorage.offlineIBAConfigPath;
+			if (typeof (sessionStorage.offlineIBAQpPath) != "undefined")
+				offlineIBAQpPath = sessionStorage.offlineIBAQpPath;
+
+			if (($(xml).find('StoreCandResponse').length > 0 && $(xml).find('StoreCandResponse').text() == 'YES') || isOfflineIBA) {
+				mockVar.storeCandResponse = 1;
+			}
+			if (!isProofReadingMock) {
+				if (mockVar.qpId != "" && typeof (mockVar.qpId) != 'undefined' && mockVar.storeCandResponse != 1 && checkFileExist(xmlFilePath + mockVar.qpId + '/quiz.xml')) {
+					mockVar.availableQpId = mockVar.qpId;
+					//console.log(727);
+					//var QPxml = readAndReturnXML(xmlFilePath+'/'+mockVar.qpId+'/quiz.xml');
+				} else {
+					mockVar.availableQpId = '';
+					//console.log(731);
+					if (mockVar.storeCandResponse != 1) {
+						var cdnPath = (typeof (sessionStorage.cdnPath) != "undefined" && sessionStorage.cdnPath != "") ? sessionStorage.cdnPath + "/" : "";
+						QPxml = readAndReturnXML(xmlFilePath + '/quiz.xml', true);
+					} else {
+						QPxml = "";
+					}
+				}
+			} else {
+				mockVar.availableQpId = '';
+				var cdnPath = (typeof (sessionStorage.cdnPath) != "undefined" && sessionStorage.cdnPath != "") ? sessionStorage.cdnPath + "/" : "";
+				if (document.URL.indexOf('isProofReading') > -1)
+					QPxml = readAndReturnXML(proofReadingQpPath + '/quiz.xml', true);
+				else
+					QPxml = readAndReturnXML('quiz.xml', true);
+			}
+			if (mockVar.storeCandResponse == 1) {
+				if (photographPath != 'NA') {
+					$(".candidateImg").attr("src", photographPath);
+				}
+				else {
+					$(".candidateImg").hide();
+				}
+			}
+			else {
+				$(".candidateImg").addClass("mockCandidateImg");
+				if ($(xml).find("USEDEFAULTCANDIDATEIMG").length > 0 && $(xml).find("USEDEFAULTCANDIDATEIMG").text() == "NO") {
+					$(".candidateImg").attr("src", $(xml).find("CANDIDATEIMGPATH").text());
+				} else {
+					$(".candidateImg").attr("src", "images/NewCandidateImage.jpg");
+				}
+				if ($(xml).find("CandidateName").length > 0) {
+					$('.candOriginalName').html(mockVar.mockCandidateName);
+				} else {
+					$('.candOriginalName').html("John Smith");
+					$('.candOriginalName').addClass("staticMockCandidateName");
+				}
+			}
+
+			var useSystemInstructions = $(xml).find("UseDefaultSystemInstruction").text();
+			var useDisclaimerInstructions = $(xml).find("UseDefaultDisclaimerInstruction").text();
+			var isOptionalSectionsAvailable = $(xml).find("ISOPTIONALSECTIONSAVAILABLE").text();
+			var isMarkedForReviewConsidered = $(xml).find("ConsiderMarkForReview").text();
+			var isInterruptionsAllowed = $(xml).find("Allowinterruptions").text();
+			var UseDefaultInstruConfiguration = typeof ($(xml).find("UseDefaultInstruConfiguration").text()) != "undefined" ? $(xml).find("UseDefaultInstruConfiguration").text() : "YES";
+			var InstructionConfigurationPath = typeof ($(xml).find("InstructionConfigurationPath").text()) != "undefined" ? $(xml).find("InstructionConfigurationPath").text() : "YES";
+			sessionStorage.customizedInstruPath = InstructionConfigurationPath;
+			if (mockVar.storeCandResponse == 0) {
+				if (document.URL.indexOf("autoMock") >= 0 && typeof ($(xml).find('autoMockBannerPath')) != "undefined" && $(xml).find('autoMockBannerPath').length > 0 && $(xml).find("autoMockBannerPath").text().trim().length > 0) {
+					$('#bannerImg').show();
+					$("#bannerImg").html("<img style='max-height:49px;' src='./" + $(xml).find("autoMockBannerPath").text() + "'/>");
+				}
+				else if ($(xml).find("BannerPath").length > 0 && $(xml).find("BannerPath").text().trim().length > 0) {
+					$('#bannerImg').show();
+					$("#bannerImg").html("<img height= '49px' src='" + $(xml).find("BannerPath").text() + "'/>");
+				}
+				if ($(xml).find("BannerText").length > 0 && $.trim($(xml).find("BannerText").text()).length > 0) {
+					$("#header").css('background-color', $(xml).find("BannerText").text());
+				}
+			}
+			else if (mockVar.storeCandResponse == 1) {
+				if ($(xml).find("ActualBannerPath").length > 0 && $(xml).find("ActualBannerPath").text().trim().length > 0) {
+					$('#bannerImg').show();
+					$("#bannerImg").html("<img height= '49px' src='" + $(xml).find("ActualBannerPath").text() + "'/>");
+					sessionStorage.bannerImagePath = $(xml).find("ActualBannerPath").text();
+				}
+				if ($(xml).find("BannerBackGroundColour").length > 0 && $.trim($(xml).find("BannerBackGroundColour").text()).length > 0) {
+					$("#header").css('background-color', $(xml).find("BannerBackGroundColour").text());
+				}
+			}
+			$("#VersionNo").html("Version " + $(xml).find("Version").text());
+			if (typeof (sessionStorage.xmlFilePath) != "undefined")
+				xmlFilePath = sessionStorage.xmlFilePath;
+			if (UseDefaultInstruConfiguration == "NO" && (InstructionConfigurationPath != "" && InstructionConfigurationPath.indexOf("html") > 0)) {
+				$("#container").hide();
+				$("#footer").hide();
+				$("#iframe").show();
+				$("#customeFile").attr('src', (xmlFilePath + "/" + InstructionConfigurationPath));
+				instructionTimer();
+			} else {
+				if (useSystemInstructions == "YES") {
+					var cdnPath = (typeof (sessionStorage.cdnPath) != "undefined" && sessionStorage.cdnPath != "") ? sessionStorage.cdnPath + "/" : "";
+					if (!isProofReadingMock && !isOfflineIBA)
+						var xml = readAndReturnXML(cdnPath + xmlFilePath + '/sysInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else if (isProofReadingMock)
+						var xml = readAndReturnXML('proofReadingSysInstructions.xml', true);
+					else if (isOfflineIBA)
+						var xml = readAndReturnXML(sessionStorage.offlineIBAConfigPath + '/sysInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else {
+					}
+					$(xml).find("INSTRUCTION").each(function () {
+						if ($.trim($(this).find("INSTRUCTIONTEXT").text()) == "")
+							xml = readAndReturnXML('sysInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					});
+				} else {
+					var cdnPath = (typeof (sessionStorage.cdnPath) != "undefined" && sessionStorage.cdnPath != "") ? sessionStorage.cdnPath + "/" : "";
+					if (!isProofReadingMock && !isOfflineIBA)
+						var xml = readAndReturnXML(cdnPath + xmlFilePath + '/sysInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else if (isProofReadingMock)
+						var xml = readAndReturnXML('proofReadingSysInstructions.xml', true);
+					else if (isOfflineIBA)
+						var xml = readAndReturnXML(sessionStorage.offlineIBAConfigPath + '/sysInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else {
+					}
+				}
+				if (useDisclaimerInstructions == "YES") {
+					var subjectInstructionsDetails = sessionStorage.SubjectLevelInstructions == "YES" && sessionStorage.subjectId != undefined && sessionStorage.subjectId != "0" ? sessionStorage.subjectId + "_" : "";
+					var cdnPath = (typeof (sessionStorage.cdnPath) != "undefined" && sessionStorage.cdnPath != "") ? sessionStorage.cdnPath + "/" : "";
+					if (!isProofReadingMock && !isOfflineIBA)
+						var xmlForDisclaimer = readAndReturnXML(cdnPath + xmlFilePath + '/' + subjectInstructionsDetails + 'custInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else if (isProofReadingMock)
+						var xmlForDisclaimer = readAndReturnXML('proofReadingCustInstructions.xml', true);
+					else if (isOfflineIBA)
+						var xmlForDisclaimer = readAndReturnXML(sessionStorage.offlineIBAConfigPath + '/' + subjectInstructionsDetails + 'custInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else {
+						//Do Nothing
+					}
+
+					$(xmlForDisclaimer).find("INSTRUCTION").each(function () {
+						if (mockVar.storeCandResponse == 1 || (mockId != undefined && mockId.indexOf("MOA") != -1)) {
+							disclaimerContent = $.trim($(this).find("DISCLAIMERTEXTOA").text());
+						}
+						else {
+							disclaimerContent = $.trim($(this).find("DISCLAIMERTEXT").text());
+						}
+						var subjectInstructionsDetails = sessionStorage.SubjectLevelInstructions == "YES" && sessionStorage.subjectId != undefined && sessionStorage.subjectId != "0" ? sessionStorage.subjectId + "_" : "";
+						if (disclaimerContent == "")
+							xmlForDisclaimer = readAndReturnXML(subjectInstructionsDetails + 'custInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					});
+				} else {
+					var cdnPath = (typeof (sessionStorage.cdnPath) != "undefined" && sessionStorage.cdnPath != "") ? sessionStorage.cdnPath + "/" : "";
+					if (typeof (sessionStorage.xmlFilePath) != "undefined")
+						xmlFilePath = sessionStorage.xmlFilePath;
+					var subjectInstructionsDetails = sessionStorage.SubjectLevelInstructions == "YES" && sessionStorage.subjectId != undefined && sessionStorage.subjectId != "0" ? sessionStorage.subjectId + "_" : "";
+
+					if (!isProofReadingMock && !isOfflineIBA)
+						var xmlForDisclaimer = readAndReturnXML(cdnPath + xmlFilePath + '/' + subjectInstructionsDetails + 'custInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else if (isProofReadingMock)
+						var xmlForDisclaimer = readAndReturnXML('proofReadingCustInstructions.xml', true);
+					else if (isOfflineIBA)
+						var xmlForDisclaimer = readAndReturnXML(sessionStorage.offlineIBAConfigPath + '/' + subjectInstructionsDetails + 'custInstructions.xml' + '?v=' + sessionStorage.assessmentUpdatedDate, true);
+					else {
+						//Do Nothing
+					}
+				}
+				parseSysInstructions('inst', xml, useSystemInstructions.toUpperCase(), orgId, mockId, isOptionalSectionsAvailable.toUpperCase(), isMarkedForReviewConsidered.toUpperCase(), QPxml, xmlForDisclaimer, useDisclaimerInstructions, isInterruptionsAllowed);
+
+				var iframe = document.getElementById('iframeId');
+				var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+				if (innerDoc.getElementById("basInst").options.length > 1) {
+					$('#iframeId').contents().find('#basInst').parent().show();
+					$('#iframeId').contents().find('#cusInst').parent().show();
+					if (mockVar.storeCandResponse == 0)
+						$('#defaultLangOptions').show();
+				}
+
+				if ($('#iframeId').contents().find('#basInst option:selected').val().indexOf('sysInstText') > -1)
+					langId = $('#iframeId').contents().find('#basInst option:selected').val().split('sysInstText')[1];
+				$('#iframeId').contents().find('.sysInstText' + langId).show();
+				$('#iframeId').contents().find('.cusInstText' + langId).show();
+				if (sessionStorage.enableVoiceOver === 'YES' || mockVar.enableVoiceOver === 'YES') {
+					formVoiceOverTextForInstruPageHtml(langId);
+				}
+				$('.sysInstText' + langId).show();
+				$('.cusInstText' + langId).show();
+				loadInstruLabels();
+				setTimeout(function () {
+					$('#pWait').hide();
+				}, 1000);
+				setTimeout(function () {
+					//$('#container').removeAttr("aria-hidden");
+					//$('#container').focus();
+				}, 1000);
+				if (mockVar.storeCandResponse == 1) {
+					$('#iframeId').contents().find("#secondPageLangView").hide();
+					if (!($('#secondPagep1 .cusInstText' + langId).text() == "The instructions are not available in the chosen language. ")) {
+						$('#secondPagep1').show();
+						$('#otherImpInstru').show();
+					}
+					else {
+						$('#secondPagep1').hide();
+						$('#otherImpInstru').hide();
+					}
+				}
+				instructionTimer();
+
+
+			}
+
+			function instructionTimer() {
+				mockVar.minInstruTime = sessionStorage.mininstrutime != undefined && sessionStorage.mininstrutime != -1 ? parseInt(sessionStorage.mininstrutime) * 60 : -1;
+				mockVar.maxInstruTime = sessionStorage.maxinstrutime != undefined && sessionStorage.maxinstrutime != -1 ? parseInt(sessionStorage.maxinstrutime) * 60 : -1;
+				mockVar.considerTime = sessionStorage.consider_instru_time != undefined ? sessionStorage.consider_instru_time : "NA";
+				mockVar.attemptTime = typeof (sessionStorage.startTime) != "undefined" ? sessionStorage.startTime : "NA";
+				mockVar.assessmentTime = typeof (sessionStorage.assessmentStartDate) != "undefined" ? sessionStorage.assessmentStartDate : "NA"
+				var waitingTime = typeof (sessionStorage.waitingTime) != "NA" && sessionStorage.waitingTime != -1 ? sessionStorage.waitingTime : "NA";
+				if (mockVar.maxInstruTime != -1) {
+					if (mockVar.minInstruTime == -1)
+						mockVar.minInstruTime = 0;
+					if (mockVar.considerTime == "YES") {
+						var date = new Date(mockVar.attemptTime);//15:06
+						var date1 = new Date(mockVar.assessmentTime);// 15:00
+						//startInstruCounter(mockVar.maxInstruTime - (date.getTime()-date1.getTime())/1000)
+						var dt = new Date();
+						if (sessionStorage.selectedGroupIds != "NA" && sessionStorage.mandateGroupUniformLaunch == 1 && waitingTime != "NA") {
+							var date2 = new Date(waitingTime);//15:05
+							dt.setSeconds(dt.getSeconds() + (mockVar.maxInstruTime - (date.getTime() - date2.getTime()) / 1000));
+						}
+						else {
+							dt.setSeconds(dt.getSeconds() + (mockVar.maxInstruTime - (date.getTime() - date1.getTime()) / 1000));
+						}
+						initializeClock(dt);
+					}
+					else if (mockVar.considerTime == "NO") {
+						//startInstruCounter(mockVar.maxInstruTime);
+						var dt = new Date();
+						dt.setSeconds(dt.getSeconds() + (mockVar.maxInstruTime));
+						initializeClock(dt);
+					}
+				} else {
+					$('.instruTimeCountDiv').hide();
+					$("#mobileTimer").hide();
+				}
+			}
+			function startInstruCounter(time) {
+				$(".instruTimeCounter").html("<b>" + mockLabels.timeLeft + "<span>" + convertTime(time) + " " + timerFormatLabel + "</span></b>");
+				$("#mobileTimer").html("<b>" + mockLabels.timeLeft + "<span>" + convertTime(time) + " " + timerFormatLabel + "</span></b>");
+				if (time > 0) {
+					if (mockVar.maxInstruTime - time > mockVar.minInstruTime) {
+						$('#disclaimer').removeAttr("disabled");
+						$('#disclaimer').removeAttr("title");
+						$('#checkBoxEnableMessage').hide();
+					} else {
+						$('#disclaimer').attr('disabled', true);
+						$('#disclaimer').attr('title', mockLabels.checkBoxEnableTitleMessage + convertTime(parseInt(mockVar.minInstruTime - (mockVar.maxInstruTime - time))) + " " + timerFormatLabel);
+						$('#readylink').attr('title', mockLabels.checkBoxEnableTitleMessage + convertTime(parseInt(mockVar.minInstruTime - (mockVar.maxInstruTime - time))) + " " + timerFormatLabel);
+						$('#agreementMessageDef').attr('title', mockLabels.checkBoxEnableTitleMessage + convertTime(parseInt(mockVar.minInstruTime - (mockVar.maxInstruTime - time))) + " " + timerFormatLabel);
+						$('#agreementMessageCustom').attr('title', mockLabels.checkBoxEnableTitleMessage + convertTime(parseInt(mockVar.minInstruTime - (mockVar.maxInstruTime - time))) + " " + timerFormatLabel);
+						$('#checkBoxEnableTime').html(convertTime(parseInt(mockVar.minInstruTime - (mockVar.maxInstruTime - time))) + " " + mockVar.timeFormat);
+						if (mockVar.minInstruTime != 0)
+							$('#checkBoxEnableMessage').show();
+					}
+					mockVar.instTimeCounter = setTimeout(function () { startInstruCounter(time - 1); }, 1000);
+				} else {
+					clearTimeout(mockVar.instTimeCounter);
+					if (mockVar.maxInstruTime > 0) {
+						document.getElementById("disclaimer").checked = true;
+						readyToBegin(true);
+					}
+				}
+			}
+			window.onbeforeunload = function (event) {
+				var url = document.URL;
+				if (url.indexOf("instructions.html") >= 0 && isAuthenticationRequired)
+					authenticationFileDeleted();
+			};
+		}
+
+	</script>
+</head>
+
+<body id="instructions_body_id" onselectstart="return false;" ondragstart="return false;">
+	<!-- <div id="iframe" style="display:none"><iframe id="customeFile" src="saved_resource.html" style="height:100%;width:100%;border:none;top:0px;position:absolute;"></iframe></div> -->
+	<div id="container" tabindex="-1" style="outline:none">
+		<section class="commanHeaderPatch">
+			<div class="subjectdetailsArea">
+				<div class="subjectdetailsAreaInside">
+					<h1 class="subjectDetailHead mockName">CS 1 Computer Science and Information Technology Mock</h1>
+					<div class="profileDetailsCricle ">
+						<div class="userProfileDataMain">
+							<button aria-label="user profile" class="userProfileBtn userProfileBtnAction">
+							</button>
+							<div class="userProfileDataDiv" style="display: none;">
+								<label class="userName">Vishal Singh</label>
+								<label class="userId">ANV12345</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div id="sr_announcement_loading" aria-live="assertive" class="visually-hidden"
+			style="overflow: hidden;position: absolute;left: -99999px;height: 1px;width: 1px;"></div>
+		<script>
+
+		</script>
+		<div id="pWait"
+			style="background: grey; height: 100%; width: 100%; z-index: 1999; position: absolute; opacity: 0.99; display: none;">
+			<div style="top:45%;position:relative;color:white">
+				<div class="load normalLoader" style="display: flex;"><span class="dot"></span><span
+						class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+				</div>
+				<center class="BCLoader" style="display: none;padding-top: 125px;">
+					<img src="images/BCLoader.gif">
+				</center>
+			</div>
+		</div>
+
+		<div role="banner" id="header" style="display: flex; align-items: center; background-color: rgb(45, 112, 182);">
+			<div id="bannerImg"><img height="49px" src="images/banner.jpg"></div>
+			<div id="bannerText" style="font-weight:bold; margin:0 auto;">
+				<font size="4" color="#ffffff"></font>
+			</div>
+		</div>
+
+		<div role="main" id="mainleft" style="float: left; border-right: 1px solid rgb(0, 0, 0); height: 888px;">
+			<div id="mobileTimer" style="float: right;padding: 10px; display: none;">Time :</div>
+			<div tabindex="-1" class="titlepath sysInstruLabel" id="instruction"
+				style="padding-left: 10px; text-align: left; outline: none;" role="heading" aria-level="1">Instructions
+			</div>
+
+
+
+			<div id="mainDivInstru"></div>
+			<div aria-hidden="false" id="commonPageInstruction" style="height: 712px;">
+				<span class="voiceOverBtn" style="display: none; height: 60px;">
+					<button id="voiceOverBtn" type="button">
+						Listen <i class="fa fa-play"></i>
+					</button> <span class="voiceOverContainer"><i class="fa fa-volume-up"></i>
+						<input aria-label="Volume slider" class="voiceOverSlider tipIcon" objid="Volume slider"
+							type="range" min="0" max="1" step="0.1" name="volume" id="volumeVoiceOver" value="1">
+					</span> <span onkeypress="clickThisElement(this,event)" role="button" tabindex="0"
+						class="settings_vo tipIcon" objid="Voice-over settings">
+					</span>
+					<div tabindex="-1" class="voiceOver_Accent_Container"
+						style="display: none; outline: none !important;">
+						<div class="accentContent">
+							<label for="chooseAccent">Choose Accent</label> <select id="chooseAccent"
+								name="chooseAccent" class="select-box chooseAccent"></select>
+						</div>
+					</div>
+				</span>
+				<iframe id="iframeId" role="presentation" src="iframesInstruction.html"
+					style="height:100%;width:100%;border:none;border-bottom:1px #CCC solid;"></iframe>
+			</div>
+			<div aria-hidden="false" role="region" aria-label="Ready to begin" class="readyBeginFooter">
+				<div id="instPagination" class="btnsection" align="center">
+					<button id="instPaginationa" onclick="showInstr()" class="btn btn-primary"
+						style="margin-top: 19px; line-height: 38px; float: right;"><span><strong><span
+									id="nextTxt">Next</span></strong><img id="imgdetails" src="images/Forward-25.png"
+								width="25" height="18"></span></button>
+				</div>
+
+				<!-- Adding Is Offline online Radio button -->
+				<div id="offlineOnlineDiv" style="display:none;padding:5px;margin-left:13px">
+					<span class="isOfflineOnline" id="OA_isOfflineOnline_Details_k19">Choose The Assessment Mode</span>
+					: <select id="isOfflineOnline" tabindex="0" aria-labelledby="OA_isOfflineOnline_Details_k19"
+						name="isOfflineOnline" class="select-box">
+						<option value="YES" class="Online" style="text-align: left;">Online</option>
+						<option value="NO" class="Offline" style="text-align: left;">Offline</option>
+					</select>
+				</div>
+
+				<div id="secondPagep2" style="display:none;padding-left:15px;overflow:auto;max-height:120px">
+					<div id="defaultDisclaimerDiv" style="direction: ltr;">
+						<div id="defaultLangOptions" style="display:none;margin-top:10px">
+							<span id="defLang">Choose your default language :</span>
+							<select id="defaultLanguage" tabindex="0" aria-labelledby="defLang"
+								aria-describedby="multiLangInstru">
+								<option value="0" style="text-align: left;">-- Select --</option>
+								<option value="1" style="text-align: left;">English</option>
+							</select>
+							<br><span class="highlightText" id="multiLangInstru">Please note all questions will appear
+								in your default language. This language can be changed for a particular question later
+								on.</span>
+						</div>
+						<div class="refdocDivinstru" id="refdocDivinstru"
+							style="display:none;line-height: 16px; margin-bottom: 3px;margin-top:5px; padding-right: 10px; float: right;">
+							<span class="instruction_icon"> </span><a class="test-instruct"
+								onclick="showReferenceDocContent(event);"><span id="refdocdownl">Reference
+									Documents</span></a>
+						</div>
+						<label class="" id="highlightDisclaimer"
+							style="line-height:16px;margin-bottom: 0;padding-left: 0;">
+							<span class="tb" style="vertical-align: top; float: left;"><input type="checkbox"
+									id="disclaimer" tabindex="0" onclick="linkDisp();" style="margin-top:1px;float:left"
+									aria-labelledby="agreementMessageDef agreementMessageCustom"> </span>
+							<span style="width:98%;display:none;margin-left: 1.5em;"
+								id="agreementMessageDef"></span><span
+								style="width: 98%; display: block; margin-left: 1.5em;"
+								id="agreementMessageCustom"><span class="cusInstText1">I have read and
+									understood the instructions. All computer hardware allotted to me are in proper
+									working condition. I declare that I am not in possession of/not wearing/not carrying
+									any prohibited gadget like mobile phone, Bluetooth devices etc/any prohibited
+									material with me into the Examination Hall. I agree that in case of not adhering to
+									the instructions, I shall be liable to be debarred from this Test and/or to
+									disciplinary action, which may include ban from future
+									Tests/Examinations.</span></span>
+							<span id="checkBoxEnableMessage" style="display:none;"><br><b>Note : </b>Check box will be
+								enabled in <span id="checkBoxEnableTime"></span></span>
+						</label>
+
+					</div>
+
+				</div>
+				<div class="btnsection" align="center" style="padding:13px">
+					<button aria-label="Previous" class="btn btn-primary" onclick="showInstr()" id="PreviousInst"
+						style="display: none; line-height: 38px; float: left;"><strong><img id="imgdetails1"
+								src="images/Backward-25.png" width="25" height="18"><span id="previousbtn">
+								Previous</span></strong></button>
+					<span id="readylinkButton">
+						<button id="readylink" aria-disabled="true" disabled="disabled"
+							class="btn btn-primary btn-primary-blue"
+							style="display:none;font-size:14.4px; line-height: 38px;">I am ready to begin
+						</button>
+						<!-- <button id="readylink" aria-disabled="true" disabled="disabled"
+							href="javascript:newReadyToBegin();" onclick="newReadyToBegin()"
+							class="btn btn-primary btn-primary-blue"
+							style="display:none;font-size:14.4px; line-height: 38px;">I am ready to begin
+						</button> -->
+					</span>
+				</div>
+			</div>
+		</div>
+		<div aria-hidden="false" role="region" aria-label="user profile" id="mainright"
+			style="border-left: 1px solid rgb(0, 0, 0); width: 20%; height: 888px;">
+			<div class="instruTimeCountDiv">
+				<div class="instruTimeCounter" style="color: red;font-weight: bold;">&nbsp;</div>
+			</div>
+			<div style="position:relative;padding:20px">
+				<center><img alt="candidate Image" id="candidate-image" class="candidateImg mockCandidateImg"
+						style="height:100px;width:100px" src="images/NewCandidateImage.jpg"> </center>
+			</div>
+			<!-- <div id="name" class="candOriginalName"
+				style="font-size: 16px; color: rgb(79, 104, 135); font-weight: bold; text-align: center;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+				John Smith</div> -->
+			<div id="candidate-name" class="candOriginalName"
+				style="font-size: 16px; color: rgb(79, 104, 135); font-weight: bold; text-align: center;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+				</div>
+			<div class="bluebg"></div>
+		</div>
+	</div>
+	<script>
+
+			$('a').mousedown(function (event) {
+				avoidKeyPressing(event);
+			});
+			$(function () {
+				$("#instPaginationa").hover(function () {
+					$("#imgdetails").attr("src", "images/Forward-25-hover.png");
+				}, function () {
+					$("#imgdetails").attr("src", "images/Forward-25.png");
+				});
+			});
+			$(function () {
+				$("#PreviousInst").hover(function () {
+					$("#imgdetails1").attr("src", "images/Backward-25-hover.png");
+				}, function () {
+					$("#imgdetails1").attr("src", "images/Backward-25.png");
+				});
+			});
+
+
+	</script>
+	<!-- <div role="contentinfo" id="footer">Version : 17.07.00</div> -->
+	<div role="dialog" aria-modal="true" aria-label="info popup" aria-describedby="cnfPopBdy_id" class="confrmPopup"
+		id="InfoPopup">
+		<div class="cnfPopHdr">
+			<div class="cnfPopHdrLbl info">Info</div>
+			<a id="popclose_id" class="fRight popClose" tabindex="0" role="button"
+				onkeypress="clickThisElement(this,event);">Close</a>
+			<div class="float-clear"></div>
+		</div>
+		<div id="cnfPopBdy_id" class="cnfPopBdy">
+			<div style="float : left"><img alt="info icon" src="images/info.gif"
+					style="vertical-align: middle; margin-right: 10px;" class="info-icon"></div>
+			<div><span id="infoMsg2" class="info-lbl"></span></div>
+		</div>
+		<div class="cnfPopBtnPnl">
+			<a class="greenBtn cnfPopNo Ok" id="okButton" tabindex="0" role="button"
+				onkeypress="clickThisElement(this,event);">OK</a>
+		</div>
+	</div>
+	<input type="hidden" id="defaultLang" value="1">
+	<div class="tooltipDiv" style="display: none; right: unset;">
+		<div class="tooltipText"></div>
+	</div>
+	<style>
+		.connected-carousels .carousel-navigation li {
+			display: inline-block;
+			padding: 0px 10px;
+			line-height: 2.2em;
+			border: 1px #cbcbcb solid;
+			color: #999999;
+			margin: 0px 5px;
+			font-size: 12px
+		}
+
+		.connected-carousels .carousel-navigation li.active {
+			background: #72a6fb;
+			color: #fff;
+			border: 1px #72a6fb solid;
+		}
+
+		.maximizeicon {
+			display: inline-block;
+			position: absolute;
+			right: 35px;
+			top: 15px;
+			cursor: pointer;
+			background-attachment: scroll;
+			background-clip: border-box;
+			background-color: rgba(0, 0, 0, 0);
+			background-image: url("images/Icon-sprite.png");
+			background-origin: padding-box;
+			background-position-x: -306px;
+			background-position-y: -75px;
+			background-repeat: no-repeat;
+			background-size: auto auto;
+			cursor: pointer;
+			height: 20px;
+			width: 22px;
+			margin: 0px auto;
+			padding: 0px 8px;
+			line-height: 1em;
+		}
+
+		.connected-carousels img {
+			width: 100%;
+			height: auto;
+		}
+
+		.pop-up-close-triggerfull {
+			background-image: url(images/fullcross.png) !important;
+			background-repeat: no-repeat;
+			position: absolute;
+			right: 35px;
+			top: 4%;
+			width: 32px !important;
+			height: 34px !important;
+			z-index: 10000000000;
+			cursor: pointer;
+			outline: none !important
+		}
+
+		.pop-up-close-trigger {
+			/* background-image: url(images/menuclose.png) !important; */
+			background-repeat: no-repeat;
+			width: 18px !important;
+			height: 18px !important;
+			outline: none !important;
+			z-index: 10000000000;
+			cursor: pointer;
+		}
+
+		.test-instruct {
+			cursor: pointer;
+		}
+
+		.download-link {
+			right: 77px !important;
+		}
+
+		.pop-up-header {
+			line-height: 2.5em;
+			width: 99%;
+		}
+
+
+		.pop-up-content {
+			width: 95%;
+		}
+
+		:root {
+			--min-size: 2px;
+			--max-size: 20px;
+		}
+
+		#pWait .load {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			margin: 0px auto;
+			left: 0px;
+			right: 0px;
+			top: 50%;
+		}
+
+		.load .dot {
+			background: white;
+			margin: 5px;
+			-webkit-animation-name: loader;
+			animation-name: loader;
+			-webkit-animation-duration: 1s;
+			animation-duration: 1s;
+			-webkit-animation-iteration-count: infinite;
+			animation-iteration-count: infinite;
+			-webkit-animation-direction: alternate;
+			animation-direction: alternate;
+		}
+
+		.load .dot:nth-child(1) {
+			-webkit-animation-delay: 0.2s;
+			animation-delay: 0.2s;
+			background: #F03782;
+		}
+
+		.load .dot:nth-child(2) {
+			-webkit-animation-delay: 0.4s;
+			animation-delay: 0.4s;
+			background: #9482C5;
+		}
+
+		.load .dot:nth-child(3) {
+			-webkit-animation-delay: 0.6s;
+			animation-delay: 0.6s;
+			background: #EF7333;
+		}
+
+		.load .dot:nth-child(4) {
+			-webkit-animation-delay: 0.8s;
+			animation-delay: 0.8s;
+			background: #64E6E1;
+		}
+
+		.load .dot:nth-child(5) {
+			-webkit-animation-delay: 1s;
+			animation-delay: 1s;
+			background: #FFE600;
+		}
+
+		@-webkit-keyframes loader {
+			from {
+				width: 2px;
+				width: var(--min-size);
+				height: 2px;
+				height: var(--min-size);
+				border-radius: calc(2px / 2);
+				border-radius: calc(var(--min-size) / 2);
+			}
+
+			to {
+				width: 20px;
+				width: var(--max-size);
+				height: 20px;
+				height: var(--max-size);
+				border-radius: calc(20px / 2);
+				border-radius: calc(var(--max-size) / 2);
+			}
+		}
+
+
+
+		@keyframes loader {
+			from {
+				width: 2px;
+				width: var(--min-size);
+				height: 2px;
+				height: var(--min-size);
+				border-radius: calc(2px / 2);
+				border-radius: calc(var(--min-size) / 2);
+			}
+
+			to {
+				width: 20px;
+				width: var(--max-size);
+				height: 20px;
+				height: var(--max-size);
+				border-radius: calc(20px / 2);
+				border-radius: calc(var(--max-size) / 2);
+			}
+		}
+
+		/* #assessmentName{
+                      min-width: 50vw;
+                      display: flex;
+                      align-items: center;
+                      justify-content: right;
+                      font-family: 'OpenSans-Light';
+        }     */
+	</style>
+
+</body>
+
+</html>

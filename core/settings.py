@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'exams',
+    'exam_interface',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

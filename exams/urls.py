@@ -14,4 +14,7 @@ urlpatterns = [
     path('api/get-question-text/<int:q_id>/', views.get_question_text, name='get_question_text'),
     path('results/<int:attempt_id>/', views.results_view, name='results_view'),
     path('question/<int:question_id>/', views.view_question, name='view_question'),
+    path('recalculate_marks/', views.backfill_all_attempts_marks, name='recalculate_marks'),
+    path('upload-pyq-package/', views.upload_pyq_package_view, name='upload_pyq_package'),
+    path('pyq-explorer/', views.pyq_explorer, name='pyq_explorer'),
 ]

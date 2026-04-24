@@ -1,3 +1,45 @@
+from django.templatetags.static import static
+
+
+subjects_actual = [
+    "Mathematical Logic",
+    "Databases",
+    "Programming in C",
+    "Theory of Computation",
+    "Data Structures",
+    "Digital Logic",
+    "Operating System",
+    "Calculus",
+    "Computer Networks",
+    "Linear Algebra",
+    "Algorithms",
+    "Graph Theory",
+    "CO & Architecture",
+    "Verbal Aptitude",
+    "Set Theory & Algebra",
+    "Probability",
+    "Compiler Design",
+    "Numerical Methods",
+    "Combinatory",
+    "Quantitative Aptitude",
+    "Object Oriented Programming",
+    "IS&Software Engineering",
+    "Web Technologies",
+    "Analytical Aptitude",
+    "Others",
+    "Spatial Aptitude",
+    "Discrete Mathematics",
+    "Programming",
+    "Machine Learning",
+    "Artificial Intelligence",
+    "Programming in Python",
+    "Engineering Mathematics",
+    "Programming and DS",
+    "AI/ML",
+    "Exam Queries",
+    "Data Mining and Warehousing"
+]
+
 subjects = [
     "Programming in C",
     "Mathematical Logic",
@@ -103,4 +145,41 @@ pool_mapping = {
     ]
 }
 
+q_types_list = ["Multiple Choice", "Multiple Select", "Numerical"]
 question_type_short_form = {"Multiple Choice": "MCQ", "Multiple Select": "MSQ", "Numerical": "NAT"}
+
+interface_behavior = {
+    "test": 
+    {
+        "remember_calc_position": True,
+        "shuffle_qs": False,
+        "allow_early_submit": True,
+        "mouse_scrolling":True,
+        "question_change_delay":False,
+        "global_answer_container": True
+    }
+    ,
+    "simulation": 
+    {
+        "remember_calc_position": False,
+        "shuffle_qs": True,
+        "allow_early_submit": False,
+        "mouse_scrolling": False,
+        "question_change_delay":(300, 50), # means 300ms +- 50ms randomly in this range
+        "global_answer_container": False
+    }
+}
+
+candidate_photo_dir = file_url = static("candidate_profile_images")
+
+ques_status_map = {
+    "not_visited": 0,
+    "not_answered": 1,
+    "answered": 2,
+    "marked_for_review": 3,
+    "answered_and_marked_for_review": 4
+}
+
+ques_status_map_display = [
+    "Not Visited", "Not Answered", "Answered", "Marked for review", "Answered and marked for review"
+]

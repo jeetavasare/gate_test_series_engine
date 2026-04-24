@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.conf import settings
 
 class UserManager(BaseUserManager):
     # Removed registration_number from required arguments
@@ -80,7 +81,7 @@ class Exam(models.Model):
 
     @property
     def display_title(self):
-        return self.title.replace("GO Classes", "").replace("CS", "GATE CS").replace(" ", " ").strip()
+        return self.title.replace("GO Classes", "").replace(" ", " ").strip()
 
     def __str__(self):
         return str(self.exam_id) + " " + self.title
@@ -112,12 +113,21 @@ class ExamQuestion(models.Model):
 
 class Attempt(models.Model):
     attempt_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attempts')
-    # on del set null becuase don't want attempts to be wiped out by wiping exam or test packages packages
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='attempts')
     exam = models.ForeignKey(Exam, on_delete=models.SET_NULL, null=True, blank=True, related_name='attempts')
+    
     submitted_at = models.CharField(max_length=100)
     time_taken_mins = models.IntegerField(null=True, blank=True)
-    historical_rank = models.IntegerField(null=True, blank=True) # picked from the results section of Gate_Mocks_17.. .json
+    historical_rank = models.IntegerField(null=True, blank=True) 
+    
+    # --- New Fields Added ---
+    marks_obtained = models.FloatField(null=True, blank=True)
+    exam_mode = models.CharField(max_length=20, null=True, blank=True)
+    session_start_time = models.DateTimeField(null=True, blank=True)
+    exam_start_time = models.DateTimeField(null=True, blank=True)
+    compensatory_time_secs = models.IntegerField(default=0)
+
+    # Stores the new optimized array structure: [[q_id, ans, time_sec, status], ...]
     responses = models.TextField(null=True, blank=True)
 
     def __str__(self):

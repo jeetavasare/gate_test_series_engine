@@ -2,18 +2,19 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-from .test_series_parser import process_package_upload
+from .test_series_parser import process_package_upload, process_pyq_package_upload
 from .models import TestPackage, Exam, User, Question, Attempt, ExamQuestion
 import re
 from django.conf import settings
-from .helper import time_mins_to_hour_mins, calculate_attempt_performance, replace_question_image_link
+from .helper import time_mins_to_hour_mins, calculate_attempt_performance, replace_question_image_link, ques_status_map_display
 from .attempt_parser import process_attempts_upload
 from django.http import JsonResponse, HttpResponseNotFound
 import json
 from django.shortcuts import get_object_or_404
 from .config import *
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 import os
+from django.db import transaction
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -282,12 +283,14 @@ def results_view(request, attempt_id):
         user_responses = {}
         # Parse new array structure, capturing the index as the true order
         for idx, item in enumerate(raw_responses):
-            q_id = int(item.get('q_id', 0))
+            q_id = int(item[0])
+            # q_id = int(item.get('q_id', 0))
             if q_id:
                 user_responses[q_id] = {
-                    'ans': item.get('ans'),
-                    'time_sec': item.get('time_sec', 0),
-                    'presented_order': idx + 1 # 1-based index
+                    'ans': item[1],
+                    'time_sec': item[2],
+                    'presented_order': idx + 1, # 1-based index
+                    "q_status": ques_status_map_display[item[3]]
                 }
     except json.JSONDecodeError:
         user_responses = {}
@@ -355,3 +358,196 @@ def view_question(request, question_id):
         'short_q_type': short_q_type,
     }
     return render(request, 'exams/question_view.html',context)
+
+@login_required(login_url='login')
+def backfill_all_attempts_marks(request):
+    attempts_to_update = []
+    
+    # Cache to store question data per exam so we don't query the DB in the loop
+    # Structure: { exam_id: { q_id: {'correct': 'A', 'award': 1.0, 'penalty': 0.33} } }
+    exam_cache = {} 
+    
+    # Fetch all attempts that actually belong to an exam
+    attempts = Attempt.objects.filter(exam__isnull=False)
+    
+    for attempt in attempts:
+        # 1. Build the cache for this specific exam if we haven't seen it yet
+        if attempt.exam_id not in exam_cache:
+            eqs = ExamQuestion.objects.filter(exam_id=attempt.exam_id).select_related('question')
+            exam_cache[attempt.exam_id] = {
+                eq.question.q_id: {
+                    'correct': eq.question.correct_answer,
+                    'award': float(eq.question.marks_award),
+                    'penalty': float(eq.question.marks_penalty)
+                } for eq in eqs
+            }
+        
+        q_dict = exam_cache[attempt.exam_id]
+        total_marks = 0.0
+        
+        # 2. Parse responses and calculate
+        try:
+            raw_responses = json.loads(attempt.responses) if attempt.responses else []
+            for item in raw_responses:
+                # Based on your new schema: [[q_id, ans, time_sec, status]]
+                q_id = int(item[0])
+                user_ans = item[1]
+                
+                if q_id in q_dict:
+                    q_data = q_dict[q_id]
+                    
+                    if q_data['correct'] == 'X':
+                        # Marks to all
+                        total_marks += q_data['award']
+                    elif user_ans:
+                        # User attempted the question
+                        correct_ans = q_data['correct']
+                        is_correct = False
+
+                        if ':' in correct_ans:
+                            try:
+                                min_val, max_val = map(float, correct_ans.split(':'))
+                                if min_val <= float(user_ans) <= max_val:
+                                    is_correct = True
+                            except ValueError:
+                                # Fails if user_ans is not a valid float
+                                pass 
+                        else:
+                            if user_ans == correct_ans:
+                                is_correct = True
+
+                        if is_correct:
+                            total_marks += q_data['award']
+                        else:
+                            total_marks -= q_data['penalty']
+                            
+        except (json.JSONDecodeError, IndexError, ValueError, TypeError) as e:
+            # Safely skip malformed JSON rows without killing the script
+            print(f"Skipping attempt {attempt.attempt_id} due to parse error: {e}")
+            continue
+        
+        # 3. Assign and queue for update
+        attempt.marks_obtained = round(total_marks, 2)  # Rounding to prevent floating point drift
+        attempts_to_update.append(attempt)
+    
+    # 4. Perform a bulk update to save massive amounts of DB queries
+    if attempts_to_update:
+        with transaction.atomic():
+            Attempt.objects.bulk_update(attempts_to_update, ['marks_obtained'], batch_size=1000)
+            
+    print(f"Crawler finished. Successfully recalculated and updated {len(attempts_to_update)} attempts.")
+
+@staff_member_required(login_url='home')
+def upload_pyq_package_view(request):
+
+    context = {}
+    if request.method == 'POST':
+        package_code = request.POST.get('package_code')
+        package_name = request.POST.get('package_name')
+        
+        results = request.FILES.get('results')
+        cs_tests = request.FILES.get('cs_tests')
+
+        if all([package_code, package_name, results, cs_tests]):
+            try:
+                result = process_pyq_package_upload(
+                    package_code, package_name, 
+                    results, cs_tests
+                )
+                context['result'] = result
+            except Exception as e:
+                context['error'] = f"Processing failed: {str(e)}"
+        else:
+            context['error'] = "All fields and files are required."
+            
+    return render(request, 'exams/upload_pyq_package.html', context)
+
+
+@login_required(login_url='login')
+def pyq_explorer(request):
+    
+    marks_list = [1.0, 2.0]
+    years_list = list(range(2002, 2027))
+
+    # Extract GET params
+    selected_subjects = request.GET.getlist('subjects')
+    selected_marks = request.GET.getlist('marks')
+    selected_q_types = request.GET.getlist('q_types')
+    start_year = int(request.GET.get('start_year', 2002))
+    end_year = int(request.GET.get('end_year', 2026))
+    order_by = request.GET.get('order_by', 'marks_award')
+    limit = int(request.GET.get('limit', 50))
+
+    questions = []
+    error_msg = ""
+
+    # Minimum filter requirement: At least one subject, one mark, one q_type
+    if selected_subjects and selected_marks and selected_q_types:
+        try:
+            pyq_package = TestPackage.objects.get(code__iexact='PYQ')
+            
+            # Base filters
+            q_filter = Q(question_exams__exam__packages=pyq_package)
+            q_filter &= Q(category__in=selected_subjects)
+            q_filter &= Q(marks_award__in=[float(m) for m in selected_marks])
+            q_filter &= Q(q_type__in=selected_q_types)
+
+            # Year filter matching exam title
+            year_q = Q()
+            for y in range(start_year, end_year + 1):
+                year_q |= Q(question_exams__exam__title__contains=str(y))
+            q_filter &= year_q
+
+            # Validate order_by to prevent injection
+            if order_by not in ['marks_award', 'category']:
+                order_by = 'marks_award'
+
+            questions = Question.objects.filter(q_filter).distinct().order_by(order_by)[:limit]
+
+            static_prefix = settings.STATIC_URL
+            for q in questions:
+                q.exam_display_name = "PYQ"  # Fallback
+
+                for qe in q.question_exams.all():
+                    title = qe.exam.title
+                    
+                    # Extract 4 digit year
+                    year_match = re.search(r'\d{4}', title)
+                    if year_match:
+                        year = year_match.group(0)
+                        display_name = f"GATE {year}"
+                        
+                        # Extract Set number (e.g., "Set 1", "Set-1", "set1")
+                        set_match = re.search(r'set\s*-?\s*(\d)', title, re.IGNORECASE)
+                        if set_match:
+                            display_name += f" Set {set_match.group(1)}"
+                            
+                        q.exam_display_name = display_name
+                        break  # Assign first matched exam and break
+                if 'gateoverflow_exam_images' in q.question_html:
+                    q.question_html = re.sub(
+                        r'src=["\'](gateoverflow_exam_images/[^"\']+)["\']', 
+                        rf'src="{static_prefix}\1"', 
+                        q.question_html
+                    )
+        except TestPackage.DoesNotExist:
+            error_msg = "PYQ package not found."
+    elif request.GET:
+        error_msg = "Please select at least one Subject, one Mark value, and one Question Type."
+
+    context = {
+        'subjects_list': subjects_actual,
+        'q_types_list': q_types_list,
+        'marks_list': marks_list,
+        'years_list': years_list,
+        'selected_subjects': selected_subjects,
+        'selected_marks': [float(m) for m in selected_marks],
+        'selected_q_types': selected_q_types,
+        'start_year': start_year,
+        'end_year': end_year,
+        'order_by': order_by,
+        'limit': limit,
+        'questions': questions,
+        'error_msg': error_msg,
+    }
+    return render(request, 'exams/pyq_explorer.html', context)

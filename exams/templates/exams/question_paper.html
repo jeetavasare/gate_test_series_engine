@@ -34,7 +34,9 @@ Que Paper: {{exam.display_title}}
     </div>
 
     <a href="{% url 'exam_details' exam.exam_id %}" class="btn-custom btn-lg px-5 fw-semibold">Exam Details</a>
-    <button class="btn-custom btn-lg px-5" style="background-color: #6c757d;" disabled>Take Exam</button>
+    <a href="{% url 'exam_prep' exam.exam_id %}" class="btn-custom btn-lg fw-semibold px-5">
+        Take Exam
+    </a>
 
 
 </div>

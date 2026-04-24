@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base href="/static/exam_interface/">
+    <script>
+        mockVar = ""
+    </script>
+     <script src="/static/js/load_math_jax.js"></script>
+
+
+    <script src="/static/js/context_fetcher.js"></script>
+    <script src="/static/js/gate_quiz.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <!-- <link rel="stylesheet" type="text/css" href="css/RightToLeft.css"> -->
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.corner.js"></script>
+    <script type="text/javascript" src="js/jquery.caret.min.js"></script>
+    <!-- <link rel="stylesheet" href="css/jquery-ui-1.10.4.custom.min.css"> -->
+    <script src="js/virtual_keyboard.js"></script>
+    <!-- <script type="text/javascript" src="js/calculatorcopyandpaste.js"></script> -->
+
+
+
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mock_style.css">
+    <!-- <link rel="stylesheet" type="text/css" href="/css/jplayer.blue.monday.css"> -->
+    <link rel="stylesheet" type="text/css" href="css/keyboard_style.css">
+    <!-- <link rel="stylesheet" href="css/nanoscroller.css"> -->
+    <link rel="stylesheet" type="text/css" media="all" href="css/style.css">
+    <link rel="stylesheet" type="text/css" media="all" href="css/quizStyle.css">
+    <!-- <link rel="stylesheet" type="text/css" href="css/thickbox.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/jquery.alerts.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/aecInstructions.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/codemirror.css"> -->
+    <link rel="stylesheet" type="text/css" href="css/keyboard_style.css">
+    <!-- <link rel="stylesheet" type="text/css" href="css/jquery.jqzoom.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/jcarousel.connected-carousels.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/popupwindow.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/blackboard.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/cobalt.css">
+    <link rel="stylesheet" type="text/css" href="css/elegant.css">
+    <link rel="stylesheet" type="text/css" href="css/cmstyle.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="css/britishCouncil.css">
+    <link rel="stylesheet" type="text/css" href="css/canvas-style.css"> -->
+    <style>
+        body {
+            user-select: none;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            /* Chrome, Safari */
+            ;
+            pointer-events: auto;
+            /* keep clicks working */
+        }
+
+        .top-banner {
+            background-color: rgb(45, 112, 182);
+            height: 50px;
+        }
+
+        .exam-header {
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #363636;
+            color: white;
+            padding: 0px 10px 0px 10px;
+        }
+
+        #exam-name {
+            color: #f7f64e;
+            font-size: 1em;
+            line-height: 30px;
+        }
+
+        .exam-header-right {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            width: 250px;
+        }
+
+        .exam-header-link-item {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .exam-header-link-item>div {
+            cursor: pointer;
+        }
+
+        .exam-header-link-item>div:hover {
+            text-decoration: underline;
+        }
+
+        .time-panel {
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 8px 0px 12px;
+            font-weight: bold;
+            border-bottom: 1px solid #c3c3c1;
+        }
+
+        .right-candidate-info {
+            width: 250px;
+            box-sizing: border-box;
+            display: flex;
+            border-left: 1px solid rgb(195, 195, 193)
+        }
+
+        .candidate-picture {
+            margin: 2px;
+            border: 1px solid #c3c3c1;
+            border-radius: 1px;
+            height: 99px;
+            width: 89px;
+            cursor: pointer;
+        }
+
+        .candidate-name {
+            color: #2c363f;
+            float: left;
+            font-size: 1.417em;
+            font-weight: bold;
+            padding: 4px;
+        }
+
+        .exam-sections {
+            height: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .calc-sub-header {
+            padding-left: 6px;
+            height: 45px;
+            background-color: #eeeeee;
+        }
+
+        .question-control {
+            display: flex;
+            border: 1px solid #c3c3c1;
+            border-right: none;
+            justify-content: space-between;
+        }
+
+        .question-control-group {
+            display: flex;
+        }
+
+        .current-question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #dbdbdb;
+            font-weight: bold;
+            padding: 3px;
+            text-align: left;
+            height: 28px;
+        }
+
+        .question-holder-area {
+            background-image: url("images/registration_number_image.png");
+            overflow: auto;
+            margin: 1px;
+            flex: 1;
+            margin-top: 2px;
+            font-size: 15px;
+            border: 1px solid #bdbdbd;
+            border-bottom: none;
+            scroll-behavior: smooth;
+        }
+
+        .section-stats {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .question-stats-active-section-header {
+            background: #147EB3 none repeat scroll 0 0;
+            color: #fff;
+            height: 31px;
+            line-height: 31px;
+            padding-left: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .question-stats-active-section-subheader {
+            background: #e5f6fd;
+            font-size: 1em;
+            font-weight: bold;
+            height: 26px;
+            line-height: 26px;
+            padding-left: 10px;
+            padding-right: 8px;
+        }
+
+        .questions-grid {
+            background: #e5f6fd;
+            overflow: auto;
+            padding: 7px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .collapsible-question-panel {
+            width: 249px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #answer:focus-visible {
+            outline: none;
+        }
+
+        #question-html {
+            font-size: 16px !important;
+            padding-left: 20px;
+            padding-top: 5px;
+        }
+
+        #question-html p {
+            font-size: 16px !important;
+        }
+
+        #question-response-area {
+            padding-left: 20px;
+        }
+
+        #ui-block-overlay {
+            position: absolute;
+            height: 100vh;
+            width: 100vw;
+            /* pointer-events: none; */
+        }
+
+        #confirm_exam_submit_overlay {
+            position: static;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            display: none;
+            flex-direction: column;
+        }
+        .submit_control_btn{
+            width: 60px;
+            padding: 10px;
+            background-color: #E0E0E0;
+            color: #444444;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #exam_summary{
+            border-collapse: collapse;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+        #exam_summary thead td{
+            background-color: rgb(228, 210, 245);
+            font-weight: bold;
+        }
+        #exam_summary td{
+            padding: 10px 20px 10px 20px;
+            font-size: 14px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        #exam_time_up_overlay{
+            position: static;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            display: none;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ui-block-overlay"></div>
+    <!-- Top banner -->
+    <div class="top-banner">
+        <img src="images/banner.jpg" style="height:100%;">
+    </div>
+
+    <!-- Header -->
+    <div class="exam-header">
+        <div id="exam-name">CS 1 Computer Science and Information Technology Mock</div>
+        <div class="exam-header-right">
+            <div class="exam-header-link-item">
+                <span class="instruction_icon" id="view-instructions"></span>
+                <div class="">Instructions</div>
+            </div>
+            <div class="exam-header-link-item" id="view-question-paper">
+                <span class="questionpaper_icon"></span>
+                <div>Question Paper</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upper split (fixed height based on content OR set manually) -->
+    <div style="display:flex;border-bottom: 1px solid #bdbdbd;">
+
+        <!-- Left -->
+        <div style="flex:1;">
+
+            <div class="calc-sub-header"> <!-- fixed -->
+
+                <div class="group-arrow-left-disabled"></div>
+
+                <div style="display: flex;justify-content: space-between;">
+                    <div class="allSections currentSectionSelected">
+                        <span style="vertical-align:middle" id="exam-name-pill">
+                            CS 1 Computer Scienc...
+                        </span>
+                        <!-- Exam stats tool tip and its icon -->
+                        <span class="tooltip1">
+                            <div class="subject_instruction_icon1 subject_instruction_icon_group">
+                            </div>
+                            <div id="subject-info-grp0" class="subject_information_div1" style="margin-top:5px;">
+                                <div class="subject_name" style="text-align:left">
+                                    <div>
+                                        <span>
+                                            <b>CS 1 Computer Science and...</b>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="notation_type_description diff_type_notation_area_inner"
+                                    style="background: none;padding-left: 8px;">
+                                    <div id="exam-answered" class="notation_typeDiv">
+                                        <span>
+                                            <span class="answered">2</span>
+                                        </span>
+                                        <span class="type_title grpAnswered langLabel" style="text-align:left">
+                                            Answered
+                                        </span>
+                                    </div>
+                                    <div id="exam-not-answered" class="notation_typeDiv">
+                                        <span>
+                                            <span class="not_answered">10</span>
+                                        </span>
+                                        <span class="type_title grpNotAnswered langLabel" style="text-align:left">
+                                            Not
+                                            Answered
+                                        </span>
+                                    </div>
+                                    <div id="exam-not-visited" class="notation_typeDiv">
+                                        <span><span class="not_visited">52</span></span>
+                                        <span class="type_title grpNotAttempted langLabel" style="text-align:left">
+                                            Not Visited
+                                        </span>
+                                    </div>
+                                    <div id="exam-marked-review" class="notation_typeDiv">
+                                        <span>
+                                            <span class="review">1</span>
+                                        </span>
+                                        <span class="type_title grpMarkReview langLabel" style="text-align:left">
+                                            Marked for
+                                            Review
+                                        </span>
+                                    </div>
+                                    <div id="exam-answered-review" class="notation_typeDiv">
+                                        <span>
+                                            <span class="review_answered">0</span>
+                                        </span>
+                                        <span class="type_title answeredLabel grpMarkedAndAnswered"
+                                            style="text-align:left">
+                                            Answered &amp; Marked for
+                                            Review (will also be evaluated)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                    <div>
+                        <div class="group-arrow-right-disabled"></div>
+
+                        <!-- CALCULATOR SHIT -->
+                        <div class="component-icon-container calculator-icon-container-new">
+                            <div align="center">
+                                <!-- component-icon-container-selected  this class was present below shows black outline-->
+                                <button onkeydown="loadCalculator(event)" onclick="loadCalculator(event);"
+                                    class="component-icon-container-btn calculator-icon-container tipIcon "
+                                    aria-expanded="false" id="calculator-icon-container-id" aria-haspopup="dialog"
+                                    aria-controls="keyPad" aria-label="Calculator" objid="Calculator">
+                                    <span class="icon-0 "></span>
+                                </button>
+                                <script>
+                                    function loadCalculator(event) {
+                                        var pLft = ($(window).width() - $(".calc_container").outerWidth());
+                                        if (!data?.interface_behavior?.remember_calc_position) {
+                                            jQuery("#loadCalc").css("top", 121).css("left", pLft);
+                                        }
+                                        $('#loadCalc').toggle();
+                                    }
+                                </script>
+                            </div>
+                            <!-- BIG CALCULATOR DIV -->
+                            <div id="loadCalc"
+                                style="position: fixed; z-index: 999; padding-top: 1%; top: 167px; left: 938px; display: none;"
+                                class="ui-draggable">
+                                <link type="text/css" rel="stylesheet" href="css/calclayout.css">
+                                <script type="text/javascript" src="js/complexCalculator.js"></script>
+                                <script type="text/javascript" src="js/mathJSNew14_5_2.min.js"></script>
+                                <script>
+                                    $('#closeButton1').click(function () {
+                                        $('#loadCalc').hide();
+                                        $('#keyPad_UserInput').val(0);
+                                        $('#keyPad_UserInput1').val('');
+                                        $('#calculator-icon-container-id').focus();
+                                    });
+
+
+                                    $(function () {
+                                        $("#loadCalc").draggable({
+                                            handle: "#helptopDiv",
+                                            start: function () {
+                                                // $(this).css({ height: "auto", width: "463px" });
+                                            },
+                                            stop: function () {
+                                                // $(this).css({ height: "auto", width: "463px" });
+                                            }
+                                        });
+                                        // var isComplex = (mockVar.showCalculator == "COMPLEX" || mockVar.showCalculatorQuesLevel == "COMPLEX");
+                                        $("#calc_min").on('click', function () {
+                                            if ($(this).hasClass("calc_min")) {
+                                                $('#mainContentArea').toggle();
+                                                $('#keyPad_Help').hide();
+                                                $('#keyPad_Helpback').hide();
+                                                $('#keyPad').addClass("reduceWidth");
+                                                $('#helptopDiv span').addClass("reduceHeader");
+                                                //		$('#calc_min').toggleClass("reduceHeader");
+                                                $(this).removeClass("calc_min").addClass('calc_max');
+                                                $('.calc_max').attr('objid', 'maximize');
+                                                $('#calc_min').attr('title', 'maximize');
+                                            }
+                                            else if ($(this).hasClass("calc_max")) {
+                                                $('#calc_min').attr('title', 'minimize');
+                                                $(this).removeClass("calc_max").addClass('calc_min');
+                                                $('.calc_min').attr('objid', 'minimize');
+                                                $('#mainContentArea').toggle();
+                                                if ($('#helpContent').is(':hidden'))
+                                                    $('#keyPad_Help').show();
+                                                else
+                                                    $('#keyPad_Helpback').show();
+                                                $('#keyPad').removeClass("reduceWidth");
+                                                $('#helptopDiv span').removeClass("reduceHeader");
+                                            }
+                                        });
+
+                                    });
+                                    $(document).ready(function () {
+
+                                        $('#closeButton1').click(function () {
+                                            $('#loadCalc').hide();
+                                        });
+                                        /** new help changes **/
+                                        $('#keyPad_Help').on('touchstart click', function () {
+                                            $(this).hide();
+                                            $('#keyPad_Helpback').show();
+                                            $('.text_container').hide();
+                                            $('.left_sec').hide();
+                                            $('#keyPad_UserInput1').hide();
+                                            {
+                                                $('#helpContent').show();
+                                                $('#helpContent').scrollTop(0);
+                                                if (mockVar.langName == "Japanese")
+                                                    $('#Japanese').show();
+                                                else
+                                                    $('#English').show();
+                                            }
+
+                                        });
+
+                                        $('#keyPad_Helpback').on('touchstart click', function () {
+                                            $(this).hide();
+                                            $('#keyPad_Help').show();
+                                            $('.text_container').show();
+                                            $('.left_sec').show();
+                                            $('#keyPad_UserInput1').show();
+                                            $('#helpContent').hide();
+                                            $('#English').hide();
+                                            $('#Japanese').hide();
+
+                                        });
+
+                                        $(document).ready(function () {
+                                            const qSel = document.querySelectorAll('.left_sec a');
+                                            for (var i = 0; i < qSel.length; i++) {
+                                                qSel[i].setAttribute('tabindex', '0');
+                                                qSel[i].setAttribute('role', 'buton');
+                                                jQuery(document).on('keydown', '#' + qSel[i].id, function (e) {
+                                                    if (event.keyCode == '13' || event.keyCode == '32') {
+                                                        event.target.click();
+                                                        event.target.focus();
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                        /** new help changes **/
+                                    });
+                                </script>
+                                <style type="text/css">
+                                    *.unselectable {
+                                        -moz-user-select: -moz-none;
+                                        -khtml-user-select: none;
+                                        -webkit-user-select: none;
+                                        -ms-user-select: none;
+                                        user-select: none;
+                                    }
+                                </style>
+
+
+
+                                <div onkeydown="javascript: keyboardDrag(event, this);" tabindex="0" role="dialog"
+                                    aria-modal="false" aria-label="calculator" id="keyPad"
+                                    class="calc_container complexFlag" style="width: 506px !important;">
+                                    <div id="helptopDiv" class="ui-draggable-handle">
+                                        <span id="scientificText">Scientific Calculator</span>
+                                        <span id="normalText" style="display:none">Normal Calculator</span>
+                                        <!--<div class="cpy-btn" style="" onclick="(function(){$('#printcpymsg').show();mockVar.iscopied=1;})()" id="cpyresult">Copy Result</div>-->
+                                        <div tabindex="0" role="button" aria-label="" class="help_back" id="keyPad_Help"
+                                            href="#nogo" onkeypress="clickThisElement(this,event)"
+                                            onclick="helpclick();"></div>
+                                        <div tabindex="0" role="button" aria-label="Back" class="help_back"
+                                            id="keyPad_Helpback" href="#nogo" style="display:none;"
+                                            onkeypress="clickThisElement(this,event)" onclick="helpbackclicked();">
+                                        </div>
+                                    </div>
+                                    <div tabindex="0" role="button" aria-label="Minimize" id="calc_min" title="minimize"
+                                        objid="Copy With Expression" class="calc_min tipIcon"
+                                        onkeypress="clickThisElement(this,event)"></div>
+                                    <div tabindex="0" role="button" aria-label="Close" id="closeButton1" title="close"
+                                        objid="close" class="calc_close tipIcon"
+                                        onkeypress="clickThisElement(this,event)"></div>
+                                    <!--<div class="calc_close" id="closeButton">X</div>-->
+                                    <div id="mainContentArea">
+                                        <div style="color: green; text-align: center; display:none;" id="printcpymsg"
+                                            aria-label="Copied Successfully...!!">Copied
+                                        </div>
+                                        <input type="hidden" id="keyPad_InputArea" class="keyPad_TextBox1 caZeroLevel"
+                                            readonly="readonly" style="width: 484px !important;" value="">
+                                        <input tabindex="-1" type="text" id="keyPad_UserInput1" class="keyPad_TextBox1"
+                                            readonly="readonly" onfocus="this.value = this.value;"
+                                            style="width: 484px !important;">
+                                        <div class="text_container">
+                                            <div class="cpy-btn" style="display:none"
+                                                onclick="copywithcalculationclicked();" id="cpyresultcalculation"
+                                                title="Copy with calculations" aria-label="Copy With Expression"><img
+                                                    id="imgcbtn">
+                                            </div>
+                                            <input type="hidden" id="keyPad_UserInput"
+                                                class="keyPad_TextBox caZeroLevel" maxlength="30" readonly="readonly"
+                                                value="0" style="width: 484px !important;">
+                                        </div>
+                                        <div class="text_container">
+                                            <input type="text" id="keyPad_OutputArea" class="keyPad_TextBox caZeroLevel"
+                                                maxlength="30" readonly="readonly" style="width: 484px !important;">
+                                            <div class="cpy-btn" style="display:none" onclick="copyclicked();"
+                                                id="cpyresult" title="Copy answer only"><img id="imgcplusbtn">
+                                            </div>
+                                            <span id="memory" class="memoryhide importantRuleMemoryScientific"
+                                                style="height:22px;">
+                                                <font size="2">M</font>
+                                            </span>
+                                        </div>
+                                        <div class="clear"></div>
+                                        <div class="left_sec">
+                                            <div class="calc_row clear">
+                                                <a id="keyPad_btnIota" class="keyPad_btnNumeric caZeroLevel"
+                                                    title="Imaginary Number"
+                                                    style="font-style: italic; margin-right: 5px;" tabindex="0"
+                                                    role="buton">i</a>
+                                                <a id="keyPad_btnMod" class="keyPad_btnBinaryOp" title="mod"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">mod</a>
+                                                <div class="degree_radian" id="dr" style="width: 84px !important;">
+                                                    <input id="degree_or_radian" type="radio" name="degree_or_radian"
+                                                        value="deg" checked="checked">Deg
+                                                    <input id="degree_or_radian" type="radio" name="degree_or_radian"
+                                                        value="rad">Rad
+                                                </div>
+                                                <a id="keyPad_btnPi" class="keyPad_btnConst"
+                                                    style="visibility: hidden; margin-right: 5px;" tabindex="0"
+                                                    role="buton">π</a>
+                                                <a id="keyPad_btnE1" class="keyPad_btnConst"
+                                                    style="visibility: hidden; margin-right: 5px; display: none;"
+                                                    tabindex="0" role="buton">e</a>
+                                                <a id="keyPad_btnE" class="keyPad_btnConst"
+                                                    style="visibility: hidden; margin-right: 5px;" tabindex="0"
+                                                    role="buton">e</a>
+                                                <a id="keyPad_MC" class="keyPad_btnMemoryOp" title="Memory Clear"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">MC</a>
+                                                <a id="keyPad_MR" class="keyPad_btnMemoryOp" title="Memory Recall"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">MR</a>
+                                                <a id="keyPad_MS" class="keyPad_btnMemoryOp" title="Memory Store"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">MS</a>
+                                                <a id="keyPad_M+" class="keyPad_btnMemoryOp" title="Memory Add"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">M+</a>
+                                                <a id="keyPad_M-" class="keyPad_btnMemoryOp" title="Memory Substract"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">M-</a>
+                                            </div>
+                                            <div class="calc_row clear">
+                                                <a id="keyPad_btnSinH" class="keyPad_btnUnaryOp min"
+                                                    title="Hyperbolic Sine" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize">sinh</a>
+                                                <a id="keyPad_btnCosinH" class="keyPad_btnUnaryOp min"
+                                                    title="Hyperbolic Cosine" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize">cosh</a>
+                                                <a id="keyPad_btnTgH" class="keyPad_btnUnaryOp min"
+                                                    title="Hyperbolic Tangent" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize">tanh</a>
+                                                <a id="keyPad_EXP" class="keyPad_btnBinaryOp" title="Exponential"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">Exp</a>
+                                                <a id="keyPad_btnOpen" class="keyPad_btnBinaryOp "
+                                                    title="Opening Bracket" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;">(</a>
+                                                <a id="keyPad_btnClose" class="keyPad_btnBinaryOp "
+                                                    title="Closing Bracket" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;">)</a>
+                                                <span>
+                                                    <a id="keyPad_btnBack" class="keyPad_btnCommand calc_arrows"
+                                                        title="Backspace" tabindex="0" role="buton"
+                                                        style="width: 82px !important;">
+                                                        <div id="calcBackBtn" style="position: relative; top: -3px">←
+                                                        </div>
+                                                    </a>
+                                                    <a id="keyPad_btnAllClr" class="keyPad_btnCommand" title="Clear"
+                                                        tabindex="0" role="buton"
+                                                        style="margin-right:5px !important;width: 39px !important;">C</a>
+                                                    <a id="keyPad_btnInverseSign" class="keyPad_btnUnaryOp"
+                                                        title="Inverse Sign" tabindex="0" role="buton"
+                                                        style="margin-right:5px !important;width: 39px !important;">+/-</a>
+                                                    <a id="keyPad_btnSquareRoot" class="keyPad_btnUnaryOp"
+                                                        title="Square Root" tabindex="0" role="buton"
+                                                        style="margin-right: 5px;">
+                                                        <div style="position: relative; top: 1px">sqrt</div>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="calc_row clear" style="margin-top: 5px;">
+                                                <a id="keyPad_btnAsinH" class="keyPad_btnUnaryOp min "
+                                                    title="Hyperbolic Inverse Sine" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize"><span
+                                                        class="baseele">sinh</span><span
+                                                        class="superscript">-1</span></a>
+                                                <a id="keyPad_btnAcosH" class="keyPad_btnUnaryOp min "
+                                                    title="Hyperbolic Inverse Cosine" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize"><span
+                                                        class="baseele">cosh</span><span
+                                                        class="superscript">-1</span></a>
+                                                <a id="keyPad_btnAtanH" class="keyPad_btnUnaryOp min "
+                                                    title="Hyperbolic Inverse Tangent" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize"><span
+                                                        class="baseele">tanh</span><span
+                                                        class="superscript">-1</span></a>
+                                                <a id="keyPad_btnLogBase2" class="keyPad_btnUnaryOp"
+                                                    title="log x to the base 2" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;"><span class="baseele">log</span><span
+                                                        class="subscript">2</span><span class="baseele">x</span></a>
+                                                <a id="keyPad_btnLn" class="keyPad_btnUnaryOp" title="Natural Log"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">ln</a>
+                                                <a id="keyPad_btnLg" class="keyPad_btnUnaryOp" title="Log" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">log</a>
+                                                <a id="keyPad_btn7" class="keyPad_btnNumeric" title="Seven" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">7</a>
+                                                <a id="keyPad_btn8" class="keyPad_btnNumeric" title="Eight" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">8</a>
+                                                <a id="keyPad_btn9" class="keyPad_btnNumeric " title="Nine" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">9</a>
+                                                <a id="keyPad_btnDiv" class="keyPad_btnBinaryOp" title="Division"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">/</a>
+                                                <a id="keyPad_perc" class="keyPad_btnBinaryOp" title="Percentage"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">%</a>
+                                            </div>
+                                            <div class="calc_row clear">
+                                                <a id="keyPad_btnPi" class="keyPad_btnConst" title="Pi" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">π</a>
+                                                <a id="keyPad_btnE" class="keyPad_btnConst" title="Napier&#39;s Number"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">e</a>
+                                                <a id="keyPad_btnFact" class="keyPad_btnUnaryOp"
+                                                    title="n&#39;s Factorial" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;">n!</a>
+                                                <a id="keyPad_btnYlogX" class="keyPad_btnBinaryOp "
+                                                    title="log x to the base y" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;"><span class="baseele">log</span><span
+                                                        class="subscript">y</span><span class="baseele">x</span></a>
+                                                <a id="keyPad_btnExp" class="keyPad_btnUnaryOp" title="e Power x"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="baseele">e</span><span class="superscript">x</span></a>
+                                                <a id="keyPad_btn10X" class="keyPad_btnUnaryOp" title="10 Power x"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="baseele">10</span><span class="superscript">x</span></a>
+
+
+                                                <a id="keyPad_btn4" class="keyPad_btnNumeric" title="Four" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">4</a>
+                                                <a id="keyPad_btn5" class="keyPad_btnNumeric" title="Five" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">5</a>
+                                                <a id="keyPad_btn6" class="keyPad_btnNumeric " title="Six" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">6</a>
+                                                <a id="keyPad_btnMult" class="keyPad_btnBinaryOp" title="Multiplication"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">
+                                                    <div id="calcMult"
+                                                        style="position: relative; top: 3px; font-size: 20px">
+                                                        *</div>
+                                                </a>
+                                                <a id="keyPad_btnInverse" class="keyPad_btnUnaryOp" title="Inverse of x"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="baseele">1/x</span></a>
+                                            </div>
+                                            <div class="calc_row clear">
+                                                <a id="keyPad_btnSin" class="keyPad_btnUnaryOp min " title="Sine"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"
+                                                    aria-label="Minimize">sin</a>
+                                                <a id="keyPad_btnCosin" class="keyPad_btnUnaryOp min" title="Cosine"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"
+                                                    aria-label="Minimize">cos</a>
+                                                <a id="keyPad_btnTg" class="keyPad_btnUnaryOp min" title="Tangent"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"
+                                                    aria-label="Minimize">tan</a>
+                                                <a id="keyPad_btnYpowX" class="keyPad_btnBinaryOp" title="x power y"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="baseele">x</span><span class="superscript">y</span></a>
+                                                <a id="keyPad_btnCube" class="keyPad_btnUnaryOp" title="x Cube"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="baseele">x</span><span class="superscript">3</span></a>
+                                                <a id="keyPad_btnSquare" class="keyPad_btnUnaryOp" title="x Square"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="baseele">x</span><span class="superscript">2</span></a>
+                                                <a id="keyPad_btn1" class="keyPad_btnNumeric" title="One" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">1</a>
+                                                <a id="keyPad_btn2" class="keyPad_btnNumeric" title="Two" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">2</a>
+                                                <a id="keyPad_btn3" class="keyPad_btnNumeric" title="Three" tabindex="0"
+                                                    role="buton" style="margin-right: 5px;">3</a>
+                                                <a id="keyPad_btnMinus" class="keyPad_btnBinaryOp" title="Substraction"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">
+                                                    <div id="calcMinus"
+                                                        style="position: relative; top: -1px; font-size: 20px">
+                                                        -</div>
+                                                </a>
+                                            </div>
+                                            <div class="calc_row clear">
+                                                <a id="keyPad_btnAsin" class="keyPad_btnUnaryOp min"
+                                                    title="Inverse Sine" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize"><span
+                                                        class="baseele">sin</span><span
+                                                        class="superscript">-1</span></a>
+                                                <a id="keyPad_btnAcos" class="keyPad_btnUnaryOp min"
+                                                    title="Inverse Cosine" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize"><span
+                                                        class="baseele">cos</span><span
+                                                        class="superscript">-1</span></a>
+                                                <a id="keyPad_btnAtan" class="keyPad_btnUnaryOp min"
+                                                    title="Inverse Tangent" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;" aria-label="Minimize"><span
+                                                        class="baseele">tan</span><span
+                                                        class="superscript">-1</span></a>
+                                                <a id="keyPad_btnYrootX" class="keyPad_btnBinaryOp" title="yth root x"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;"><span
+                                                        class="superscript" style="top: -8px;">y</span><span
+                                                        class="baseele"
+                                                        style="font-size: 1.2em; margin: -6px 0 0 -9px;">√x</span></a>
+                                                <a id="keyPad_btnCubeRoot" class="keyPad_btnUnaryOp" title="Cube Root"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">
+                                                    <font size="3">∛ </font>
+                                                </a>
+                                                <a id="keyPad_btnAbs" class="keyPad_btnUnaryOp"
+                                                    title="Absolute Value of x" tabindex="0" role="buton"
+                                                    style="margin-right: 5px;"><span class="baseele">|x|</span></a>
+                                                <a id="keyPad_btn0" class="keyPad_btnNumeric" title="Zero" tabindex="0"
+                                                    role="buton" style="width: 82px !important;">0</a>
+                                                <a id="keyPad_btnDot" class="keyPad_btnNumeric " title="Decimal Point"
+                                                    tabindex="0" role="buton"
+                                                    style="margin-right:5px !important; width:39px !important;">.</a>
+                                                <a id="keyPad_btnPlus" class="keyPad_btnBinaryOp" title="Addition"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">+</a>
+                                                <a id="keyPad_btnEnter" class="keyPad_btnCommand " title="Equal"
+                                                    tabindex="0" role="buton" style="margin-right: 5px;">
+                                                    <div id="calcEnter" style="margin-bottom: 2px;">=</div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div id="helpContent" style="display:none;">
+                                            <span id="English" style="display: none;">
+                                                <h3 style="text-align: center;">
+                                                    <strong>Calculator Instructions</strong>
+                                                </h3> Allows you to perform basic and complex mathematical
+                                                operations such as modulus, square root, cube root,
+                                                trigonometric, exponential, logarithmic, hyperbolic
+                                                functions, Imaginary Operations, etc. <br>
+                                                You can operate the calculator using the buttons provided on
+                                                screen with your mouse. <br> <br>
+                                                <h3 style="text-decoration: underline; color: green">Do's:
+                                                </h3>
+                                                <ul style="all: revert;">
+                                                    <li style="text-align: left;">Be sure to press [C] when
+                                                        beginning button new calculation.</li>
+                                                    <li style="text-align: left;">Simplify an equation using
+                                                        parenthesis and other mathematical operators.</li>
+                                                    <li style="text-align: left;">Use the predefined
+                                                        operations such as π(Pi), log, Exp to save time
+                                                        during calculation.</li>
+                                                    <li style="text-align: left;">Use memory function for
+                                                        calculating cumulative totals.</li>
+                                                    <strong> [M+]: Will add displayed value to memory. <br>
+                                                        [MR]: Will recall the value stored in memory. <br>
+                                                        [M-]: Subtracts the displayed value from memory.
+                                                    </strong>
+                                                    <li style="text-align: left;">Be sure select the angle
+                                                        unit (Deg or Rad) before beginning any calculation.
+                                                    </li>
+                                                    <strong>Note: By default angle unit is set as
+                                                        Degree</strong>
+                                                </ul><br> <br>
+                                                <h3>
+                                                    <span style="text-decoration: underline; color: red">Dont's:</span>
+                                                </h3>
+                                                <ul style="all: revert;">
+                                                    <li style="text-align: left;">Perform multiple
+                                                        operations together.</li>
+                                                    <li style="text-align: left;">Leave parenthesis
+                                                        unbalanced.</li>
+                                                    <li style="text-align: left;">Change the angle unit (Deg
+                                                        or Rad) while performing button calculation..</li>
+                                                </ul><br> <br>
+                                                <h3>
+                                                    <span style="text-decoration: underline;">Limitations:</span>
+                                                </h3>
+                                                <ul style="all: revert;">
+                                                    <li style="text-align: left;">Keyboard operation is
+                                                        disabled.</li>
+                                                    <li style="text-align: left;">The output for button
+                                                        Factorial calculation is precise up to 14 digits.
+                                                    </li>
+                                                    <li style="text-align: left;">The output for Logarithmic
+                                                        and Hyperbolic calculations is precise up to 5
+                                                        digits.</li>
+                                                    <li style="text-align: left;">Modulus (mod) operation
+                                                        performed on decimal numbers with 15 digits would
+                                                        not be precise.</li>
+                                                    <br>
+                                                    <strong> Use mod operation only if the number comprises
+                                                        of less than 15 digits i.e. mod operation provides
+                                                        best results for smaller numbers.</strong>
+                                                    <br>
+                                                    <li style="text-align: left;">The range of value
+                                                        supported by the calculator is 10^(-323) to
+                                                        10^(308).</li>
+                                                </ul> <br> <br>
+                                            </span>
+                                            <span id="Japanese" style="display: none;">
+                                                <h3 style="text-align: center;">
+                                                    <strong>関数電卓の使い方</strong>
+                                                </h3> 平方根、三角関数、指数関数、対数関数、双曲線関数など、基本的で複雑な数学演算を行います。 <br>
+                                                画面上のボタンを使って計算機を操作します。 <br> <br>
+                                                <h3 style="text-decoration: underline; color: green">［操作方法］
+                                                </h3>
+                                                <ul style="all: revert;">
+                                                    <li style="text-align: left;">［C］ボタンをクリックしてから、操作してください
+                                                    </li>
+                                                    <li style="text-align: left;">単純に括弧やその他の数学演算を使用する方程式
+                                                    </li>
+                                                    <li style="text-align: left;">定義済みの π (パイ)や log, Exp(対数)
+                                                        を使って演算をすると時間を短縮できます</li>
+                                                    <li style="text-align: left;">メモリ機能を使って、累計を演算をします</li>
+                                                    <strong> [M+]: メモリへ画面に表示されている値を追加します<br>
+                                                        [MR]: メモリに保存している値を再度呼び出します <br>
+                                                        [M-]: メモリから画面に表示されている値を引きます
+                                                    </strong>
+                                                    <li style="text-align: left;">
+                                                        演算をする前に、角度（度数法・弧度法）を選択してください</li>
+                                                    <strong>注意: 既定値は度数法です</strong>
+                                                </ul>
+                                                <h3>
+                                                    <span style="text-decoration: underline; color: red">［注意事項］</span>
+                                                </h3>
+                                                <ul style="all: revert;">
+                                                    <li style="text-align: left;">一度に複数の演算を行うことはできません</li>
+                                                    <li style="text-align: left;">
+                                                        開き括弧・閉じ括弧の数が合わない、適切な位置に括弧がある</li>
+                                                    <li style="text-align: left;">
+                                                        演算中に角度（度数法・弧度法）を変更することはできません</li>
+                                                </ul>
+                                                <h3>
+                                                    <span style="text-decoration: underline;">制限事項：</span>
+                                                </h3>
+                                                <ul style="all: revert;">
+                                                    <li style="text-align: left;">キーボード操作はできません</li>
+                                                    <li style="text-align: left;">階乗演算は14桁までの精度で出力されます</li>
+                                                    <li style="text-align: left;">
+                                                        対数関数・双曲線関数の演算結果は5桁までの精度で出力されます</li>
+                                                    <li style="text-align: left;">
+                                                        10進数で15桁以上のモッド演算(mod)を行う場合、演算の精度が下がります</li>
+                                                    <br>
+                                                    <strong>
+                                                        モッド演算は15桁未満の演算で使用してください。（15桁未満の演算に適しています）</strong>
+                                                    <br>
+                                                    <li style="text-align: left;">計算機で演算可能な数値の範囲は 10(-323) ～
+                                                        10(308).0です</li>
+                                                </ul> <br> <br>
+                                            </span>
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="time-panel">
+                <div style="color: #49525b">Sections</div>
+                <div style="color: #333;font-size: 1.2em;">
+                    Time Left : <span id="examination-countdown-mins">180:00</span>
+                </div>
+            </div>
+
+            <div class="exam-sections">
+                <div>
+                    <div class="subject-arrow-left-disabled"></div>
+                    <div role="tablist" id="sections" aria-label="section">
+                        <div class="subject-name">
+                            <span title="General Aptitude">General Aptitude</span>
+                            <!-- Subject Tooltip -->
+                            <span class="tooltip1">
+                                <div class="subject_instruction_icon1 subject_instruction_icon_section">
+                                </div>
+                                <div class="subject_information_div1">
+                                    <div class="subject_name" style="text-align:left">
+                                        General Aptitude
+                                    </div>
+                                    <div class="notation_type_description diff_type_notation_area_inner"
+                                        style="background: none;text-align: left; padding-left: 8px;">
+                                        <div class="notation_typeDiv">
+                                            <span id="section-answered" class="answered">
+                                                0
+                                            </span>
+                                            <span class="type_title secAnswered longtext-hide1" style="text-align:left">
+                                                Answered
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv">
+                                            <span id="section-not-answered" class="not_answered">
+                                                2
+                                            </span>
+                                            <span class="type_title secNotAnswered longtext-hide1"
+                                                style="text-align:left">
+                                                Not Answered
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv">
+                                            <span id="section-not-visited" class="not_visited">
+                                                8
+                                            </span>
+                                            <span class="type_title secNotAttempted longtext-hide1"
+                                                style="text-align:left">
+                                                Not Visited
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv">
+                                            <span id="section-marked-review" class="review">
+                                                0
+                                            </span>
+                                            <span class="type_title secMarkReview longtext-hide1"
+                                                style="text-align:left">
+                                                Marked for Review
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv review_answer">
+                                            <span id="section-answered-review" class="review_answered">
+                                                0
+                                            </span>
+                                            <span class="type_title secMarkedAndAnswered longtext-hide1"
+                                                style="text-align:left">
+                                                Answered &amp; Marked for Review
+                                                (will also be evaluated)
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="subject-name selectedsubject">
+                            <span class="sectionName" title="CS 1 Computer Science and Information Technology">
+                                CS 1 Computer Scienc...
+                            </span>
+                            <!-- Subject Tooptip -->
+                            <span class="tooltip1">
+                                <div class="subject_instruction_icon1 subject_instruction_icon_section">
+                                </div>
+                                <div class="subject_information_div1">
+                                    <div>
+                                        <div class="subject_name" style="text-align:left">
+                                            CS 1 Computer Science and...
+                                        </div>
+                                    </div>
+                                    <div class="notation_type_description diff_type_notation_area_inner"
+                                        style="background: none 0px 0px repeat scroll rgb(229, 246, 252); text-align: left; padding-left: 8px;">
+                                        <div class="notation_typeDiv">
+                                            <span id="section-answered" class="answered">
+                                                2
+                                            </span>
+                                            <span class="type_title secAnswered longtext-hide1" style="text-align:left">
+                                                Answered
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv">
+                                            <span id="section-not-answered" class="not_answered">
+                                                8
+                                            </span>
+                                            <span class="type_title secNotAnswered longtext-hide1"
+                                                style="text-align:left">
+                                                Not Answered
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv">
+                                            <span id="section-not-visited" class="not_visited">
+                                                44
+                                            </span>
+                                            <span class="type_title secNotAttempted longtext-hide1"
+                                                style="text-align:left">
+                                                Not Visited
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv">
+                                            <span id="section-marked-review" class="review">
+                                                1
+                                            </span>
+                                            <span class="type_title secMarkReview longtext-hide1"
+                                                style="text-align:left">
+                                                Marked for Review
+                                            </span>
+                                        </div>
+                                        <div class="notation_typeDiv review_answer">
+                                            <span id="section-answered-review" class="review_answered">
+                                                0
+                                            </span>
+                                            <span class="type_title secMarkedAndAnswered longtext-hide1"
+                                                style="text-align:left">
+                                                Answered &amp; Marked for Review
+                                                (will also be evaluated)
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="subject-arrow-right-disabled"></div>
+            </div>
+
+        </div>
+
+        <!-- Right Candidate info panel -->
+        <div class="right-candidate-info">
+            <img class="candidate-picture" id="candidate-image" src="images/NewCandidateImage.jpg">
+            <div class="candidate-name" id="candidate-name">John Smith</div>
+        </div>
+
+    </div>
+
+    <!-- Bottom section (takes ALL remaining space) -->
+    <div style="flex:1;display:flex;overflow:hidden;">
+        <div id="exam_time_up_overlay">
+            <div>Time Over!</div>
+            <div>Submitting Exam please wait</div>
+        </div>
+        <div id="confirm_exam_submit_overlay">
+            <table id="exam_summary">
+                <thead>
+                    <td>Section Name</td>
+                    <td>No. of Questions</td>
+                    <td>Answered</td>
+                    <td>Not Answered</td>
+                    <td>Marked for Review</td>
+                    <td>Answered and Marked for Review</td>
+                    <td>Not Visited</td>
+                </thead>
+                <tbody>
+
+                </tbody>
+
+            </table>
+            <div>Are sure you want to submit the Exam ?</div>
+            <div style="display: flex;gap: 20px;margin-top: 10px;">
+                <button id="exam_submit_yes" class="submit_control_btn">Yes</button>
+                <button id="exam_submit_no" class="submit_control_btn">No</button>
+
+            </div>
+        </div>
+        <div style="flex:1;display:flex;overflow:hidden;">
+            <!-- Question area -->
+            <div
+                style="display: flex; flex:1;overflow:hidden;flex-direction: column;border: 1px solid #bdbdbd;border-top: none;">
+                <div class="questionTypeCont displayQuestionTypeContent" style="border-top: none;">
+                    <span id="questiontype-details_id" class="questiontype-details">
+                        <span class="questionType langLabel">Question Type:</span>
+                        <span id="current_question_type">MCQ</span>
+                    </span>
+                    <span class="questiontype-markpanel">
+                        <span class="marking-details">
+                            <span class="correctAnswer langLabel" lang="en">Marks for correctanswer:</span>
+                            <span style="color:green" id="current-question-correct-marks">2</span><span
+                                class="negativeMarksSep"> |</span>
+                            <span class="negativeMarks langLabel" lang="en"> Negative Marks: </span>
+                            <span style="color:#A80000" id="current-question-penalty-marks">2/3</span>
+                        </span>
+                    </span>
+                </div>
+                <div class="question-holder-area">
+                    <div class="current-question-header">
+                        <b>Question No. <span id="current-question-number">1</span></b>
+                        <img style="cursor: pointer;" width="28" height="28" alt="" src="images/Down.png"
+                            id="question-container-scroll-down">
+                    </div>
+                    <div id="question-html">
+                    </div>
+                    <div id="question-response-area"></div>
+                    <!-- <script>triggerKeyboard(1, true)</script>
+                    <div style="padding-left: 4%;" id="numericKeyBoardDiv"><span id="ariaDescForSAinput"></span>
+                        <input aria-labelledby="ariaDescForSAinput" type="text" id="answer" autocomplete="off"
+                            class=" keyboardInput answer" readonly value="" onchange="checkSAMandatory(false)"
+                            style="text-align: left;">
+                        <div id="vKeyboard" class="vKeyboard " style="width: 145px;"><span class="vKeyboardSplKeys"
+                                role="button" tabindex="0" style="border-radius: 6px;">Backspace</span><br><span
+                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="Number 7"
+                                style="border-radius: 6px;">7</span><span class="vKeyboardKeys" role="button" tabindex="0"
+                                aria-label="Number 8" style="border-radius: 6px;">8</span><span class="vKeyboardKeys"
+                                role="button" tabindex="0" aria-label="Number 9"
+                                style="border-radius: 6px;">9</span><br><span class="vKeyboardKeys" role="button"
+                                tabindex="0" aria-label="Number 4" style="border-radius: 6px;">4</span><span
+                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="Number 5"
+                                style="border-radius: 6px;">5</span><span class="vKeyboardKeys" role="button" tabindex="0"
+                                aria-label="Number 6" style="border-radius: 6px;">6</span><br><span class="vKeyboardKeys"
+                                role="button" tabindex="0" aria-label="Number 1" style="border-radius: 6px;">1</span><span
+                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="Number 2"
+                                style="border-radius: 6px;">2</span><span class="vKeyboardKeys" role="button" tabindex="0"
+                                aria-label="Number 3" style="border-radius: 6px;">3</span><br><span class="vKeyboardKeys"
+                                role="button" tabindex="0" aria-label="Number 0" style="border-radius: 6px;">0</span><span
+                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="point"
+                                style="border-radius: 6px;">.</span><span class="vKeyboardKeys" role="button" tabindex="0"
+                                aria-label="negative" style="border-radius: 6px;">-</span><br><span class="vKeyboardSplKeys"
+                                role="button" tabindex="0" data="left"
+                                style="font-weight: normal; border-radius: 6px;">←</span><span class="vKeyboardSplKeys"
+                                role="button" tabindex="0" data="right"
+                                style="font-weight: normal; border-radius: 6px;">→</span><br><span class="vKeyboardSplKeys"
+                                role="button" tabindex="0" style="border-radius: 6px;">Clear All</span><br></div>
+                    </div> -->
+                    <div style="text-align: end;">
+                        <img style="cursor: pointer;" width="30" height="30" alt="" src="images/Up.png"
+                            id="question-container-scroll-up">
+                    </div>
+                </div>
+                <div class="question-control">
+                    <div class="question-control-group">
+                        <input type="button" class="normalBtn btn tempBtnClass btn-primary underreview"
+                            id="mark_for_review" value="Mark for Review &amp; Next" style="margin-left: 1%;">
+                        <input type="button" tabindex="0" class="normalBtn tempBtnClass btn btn-primary clearResponse"
+                            id="clear_response" value="Clear Response">
+                    </div>
+                    <div class="question-control-group">
+                        <input type="button" class="tempBtnClass btn btn-primary previousBtn btnEnabled" id="previous"
+                            value="Previous">
+                        <input type="button" style="margin-left: 5px; line-height: 33px;" id="save_and_next"
+                            class="normalBtn tempBtnClass btn btn-primary-save btnEnabled savenext"
+                            value="Save &amp; Next">
+                    </div>
+                </div>
+                <span title="Show Question Number Panel" class="expand_icon tipIcon" tabindex="0" role="button"
+                    style="display: none;"></span>
+            </div>
+            <!-- Question panel -->
+            <div class="collapsible-question-panel">
+                <span title="Collapse Question No. Panel" class="collapse_icon tipIcon"
+                    style="left: 86%;top: 54%;"></span>
+                <div class="section-stats diff_type_notation_area_inner">
+                    <div role="listitem" class="notation_typeDiv leftdiv_notation">
+                        <span class="answered answeredCount" id="side-panel-answered-count">2</span> <span
+                            class="type_title answeredLabel langLabel longtext-hide" id="" lang="en">Answered</span>
+                    </div>
+                    <div role="listitem" class="notation_typeDiv">
+                        <span class="not_answered notAnsweredCount" id="side-panel-not-answered-count">8</span> <span
+                            class="type_title notAnsweredLabel langLabel longtext-hide" id="" lang="en">Not
+                            Answered</span>
+                    </div>
+                    <div role="listitem" class="notation_typeDiv leftdiv_notation">
+                        <span class="not_visited notVisitedCount" id="side-panel-not-visited-count">44</span> <span
+                            class="type_title notVisitedLabel langLabel longtext-hide" id="" lang="en">Not
+                            Visited</span>
+                    </div>
+                    <div role="listitem" class="notation_typeDiv MarkForReviewDiv">
+                        <span class="review markedCount" id="side-panel-marked-for-review-count">1</span> <span
+                            class="type_title markedLabel langLabel longtext-hide" id="" lang="en">Marked for
+                            Review</span>
+                    </div>
+                    <div role="listitem" class="notation_typeDiv answered_review_container review_answer"
+                        style="margin-right:69px">
+                        <span class="review_answered markedAnsweredCount"
+                            id="side-panel-answered-and-marked-for-review-count">0</span>
+                        <span class="type_title langLabel markedAndAnsweredLabel" id="" lang="en">Answered &amp; Marked
+                            for
+                            Review (will also be
+                            evaluated)</span>
+                    </div>
+                </div>
+                <div class="question-stats-active-section-header">
+                    &nbsp;
+                    <span class="viewSection">
+                        <b title="General Aptitude" id="side-panel-section-name">General Aptitude</b>
+                    </span>
+                </div>
+                <div class="question-stats-active-section-subheader">Choose a Question</div>
+                <div class="questions-grid">
+                    <div class="question_area" style="background-color: inherit;">
+                        <span objid="Answered" id="0" class="tipIcon numpan answered auditlog 0 selectedquestion"
+                            onclick="javascript:changeQues(0);; updatenumberpaneltabBtn(this)" tabindex="0" role="tab"
+                            aria-controls="currentQues" aria-selected="true" onkeypress="clickThisElement(this,event)"
+                            aria-label="Question 1, Answered, " style="pointer-events: auto;"> 1</span>
+                        <span objid="Marked for Review" id="1" class="tipIcon numpan review auditlog 1"
+                            onclick="javascript:changeQues(1);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
+                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
+                            aria-label="Question 2, Marked for Review, " style="pointer-events: auto;"> 2</span>
+                        <span objid="Not Answered" id="2" class="tipIcon numpan not_answered auditlog 2"
+                            onclick="javascript:changeQues(2);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
+                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
+                            aria-label="Question 3, Not Answered, " style="pointer-events: auto;"> 3</span>
+                        <span objid="Not Visited" id="3" class="tipIcon numpan not_visited auditlog 3"
+                            onclick="javascript:changeQues(3);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
+                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
+                            aria-label="Question 4, Not Visited, " style="pointer-events: auto;"> 4</span>
+                        <span objid="Answered &amp; Marked for Review (will also be evaluated)" id="4"
+                            class="tipIcon numpan review_answered auditlog 4"
+                            onclick="javascript:changeQues(4);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
+                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
+                            aria-label="Question 5, Answered &amp; Marked for Review (will also be evaluated), "
+                            style="pointer-events: auto;"> 5</span>
+                    </div>
+                </div>
+                <div style="background-color: #e5f6fd;text-align: center;border: 1px solid #c3c3c1;border-left: none;">
+                    <input type="button" class="btn btn-primary-blue" id="finalSubmit" value="Submit"
+                        disabled="disabled" title="Submit button will be enabled after 176:14  (MM:SS)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+
+            // Initial state (optional: set based on current display)
+            if ($('.collapsible-question-panel').css('display') === 'flex') {
+                $('.expand_icon').css('display', 'none');
+                $('.collapse_icon').css('display', 'inline');
+            } else {
+                $('.expand_icon').css('display', 'inline');
+                $('.collapse_icon').css('display', 'none');
+            }
+
+            // Click handler (adjust selector to whatever should trigger toggle)
+            $('.expand_icon, .collapse_icon').on('click', function () {
+
+                let panel = $('.collapsible-question-panel');
+
+                if (panel.css('display') === 'none') {
+                    // Show panel
+                    panel.css('display', 'flex');
+
+                    $('.expand_icon').css('display', 'none');
+                    $('.collapse_icon').css('display', 'inline');
+
+                } else {
+                    // Hide panel
+                    panel.css('display', 'none');
+
+                    $('.expand_icon').css('display', 'inline');
+                    $('.collapse_icon').css('display', 'none');
+                }
+
+            });
+
+        });
+
+
+    </script>
+
+</body>
+
+</html>

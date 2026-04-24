@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="/static/exam_interface/">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <title>Login</title>
+
+    <link href="css/style-login.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/keyboard.css">
+    <!-- <link rel="stylesheet" href="css/number_style.css"> -->
+
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="js/keyboard.js"></script>
+
+    <script src="/static/js/context_fetcher.js"></script>
+    <script src="/static/js/gate_login.js"></script>
+
+    <style>
+        input.simulated-disabled {
+            background-color: #F3F3F3;
+            color: #545454;
+            cursor: default;
+            border: 1px solid #ccc;
+        }
+
+        input.simulated-disabled:focus {
+            outline: none;
+        }
+
+        #errorMessageBox {
+            visibility: hidden ;
+            height: 50px;
+            line-height: 45px;
+            text-align: center;
+            font-weight: 600;
+            box-sizing: border-box;
+            padding: 5px;
+            font-size: 14px;
+            border-bottom-left-radius: 0px;
+            margin-top: 50px !important;
+            background: #be2a2a;
+            width: 370px;
+            margin: auto;
+        }
+    </style>
+
+</head>
+
+<body onselectstart="return false;" ondragstart="return false;">
+    <div id="wrapper">
+        <div id="indexLoader"
+            style="background: grey; height: 100%; width: 100%; z-index: 1999; position: absolute; opacity: 0.99; filter: alpha(opacity = 85);display:none;">
+            <div class="load normalLoader">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span
+                    class="dot"></span><span class="dot"></span>
+            </div>
+        </div>
+        <div id="minwidth">
+            <div id="header" style="background-color: rgb(45, 112, 182); --headerBG: #2D70B6;">
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td align="left" id="bannerImage">
+                                <div id="bannerImg" style="float:left"><img max-height="49px" src="images/banner.jpg">
+                                </div>
+                                <div id="bannerText" align="center" style="margin-top:10px; font-weight:bold;">
+                                    <font size="4" color="#ffffff"></font>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="userInfo">
+                <div class="system_info">
+                    <div class="system_name">
+                        <div id="sysName" class="name1">System Name :</div>
+                        <div class="details1" id="mockSysNum">C<span id="candidate_system_number">001</span></div>
+                        <div style="font-size:15px;" class="details3">
+                            <a onclick="notMySystem();" style="color: white; text-decoration: none; border: 0 none;"
+                                id="notMySystem">Kindly contact the invigilator if there are any discrepancies in the
+                                Name and Photograph displayed on the screen or if the photograph is not yours</a>
+                        </div>
+                    </div>
+                    <div align="center" class="user_pic">
+                        <img width="94" height="101" align="absmiddle" id="candidate_photo"
+                            class="candidateImg mockCandidateImg" src="images/NewCandidateImage.jpg">
+                    </div>
+                    <div class="user_name" style="width: auto;">
+                        <div id="indexCandName" class="name2">Candidate Name :</div>
+                        <div class="details2">
+                            <span title="" class="candOriginalName" id="candidate_name"></span>
+                        </div>
+                        <div style="margin-top:10px;text-align:right">
+                            <span class="name2" id="subName">Subject:</span>
+                            <span style="font-size:15px;" class="details2" id="mockSubName">Mock Exam</span>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+            <div id="errorMessageBox" class="bg-danger text-white">Server Error Message</div>
+            <div id="login" style="margin-top: 0px;">
+                <div class="form-header" id="LoginPageHeader">Login</div>
+                <form name="form-login">
+                    <span class="fontawesome-user"></span>
+                    <input id="candidate_reg_num" type="text" name="text15"
+                        class="mandat_input keyboardInput loginText simulated-disabled" readonly value="">
+
+
+                    <span class="fontawesome-lock"></span>
+                    <input id="candidate_dob" type="password" value=""
+                        class="mandat_input keyboardInput loginText simulated-disabled" readonly name="text14"
+                        autocomplete="off">
+
+                    <a> <span id="signInLabel" class="btn btn-primary btn-primary-blue" style="line-height: 35px"
+                            tabindex="0">Sign In</span></a>
+                </form>
+            </div>
+        </div>
+
+        <!-- <div id="footer">
+            <center><div> Version 17.05.21</div></center>
+            <div class="clear"></div>
+        </div> -->
+    </div>
+
+    <script>
+        if ($.support.msie && $.browser.version < 7) {
+            alert("Please use IE 7.0 or above");
+            $("a.login_button").attr("disabled", "disabled");
+            $("a.login_button").parent().parent().parent().parent().prepend("<tr><td colspan=2 style='text-align:center;color:red'> <h2> Please use IE 7.0 or above</h2></td></tr>");
+        }
+        $('a').mousedown(function (event) {
+            // avoidKeyPressing is likely undefined without specific js file loading successfully
+            if (typeof avoidKeyPressing === "function") {
+                avoidKeyPressing(event);
+            }
+        });
+        function notMySystem() {
+            // mockLabels is likely undefined
+            if (typeof mockLabels !== "undefined") {
+                alert(mockLabels.notMySystem);
+            } else {
+                alert("Kindly contact the invigilator.");
+            }
+        }
+    </script>
+
+    <style>
+        #indexLoader .load {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            margin: 0px auto;
+            left: 0px;
+            right: 0px;
+            top: 50%;
+        }
+
+        .load .dot {
+            background: white;
+            margin: 5px;
+            -webkit-animation-name: loader;
+            animation-name: loader;
+            -webkit-animation-duration: 1s;
+            animation-duration: 1s;
+            -webkit-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+            -webkit-animation-direction: alternate;
+            animation-direction: alternate;
+        }
+
+        .load .dot:nth-child(1) {
+            -webkit-animation-delay: 0.2s;
+            animation-delay: 0.2s;
+            background: #F03782;
+        }
+
+        .load .dot:nth-child(2) {
+            -webkit-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+            background: #9482C5;
+        }
+
+        .load .dot:nth-child(3) {
+            -webkit-animation-delay: 0.6s;
+            animation-delay: 0.6s;
+            background: #EF7333;
+        }
+
+        .load .dot:nth-child(4) {
+            -webkit-animation-delay: 0.8s;
+            animation-delay: 0.8s;
+            background: #64E6E1;
+        }
+
+        .load .dot:nth-child(5) {
+            -webkit-animation-delay: 1s;
+            animation-delay: 1s;
+            background: #FFE600;
+        }
+
+        @-webkit-keyframes loader {
+            from {
+                width: 2px;
+                height: 2px;
+                border-radius: 1px;
+            }
+
+            to {
+                width: 20px;
+                height: 20px;
+                border-radius: 10px;
+            }
+        }
+
+        @keyframes loader {
+            from {
+                width: 2px;
+                height: 2px;
+                border-radius: 1px;
+            }
+
+            to {
+                width: 20px;
+                height: 20px;
+                border-radius: 10px;
+            }
+        }
+    </style>
+</body>
+
+</html>

@@ -114,7 +114,9 @@ Test Series Engine
                             <td>{{ exam.total_questions }}</td>
                             <td>{{ exam.total_marks }}</td>
                             <td>
-                                <button class="btn-custom btn-sm mb-1" disabled>Take Exam</button>
+                            <a href="{% url 'exam_prep' exam.exam_id %}" class="btn-custom btn-sm mb-1">
+                                Take Exam
+                            </a>
                                 {% if request.user.is_superuser or request.user.is_staff %}
                                 <a href="{% url 'question_paper' exam.exam_id %}" target="_blank"
                                     class="btn-custom btn-sm" style="background-color: #6c757d;">View Paper</a>
