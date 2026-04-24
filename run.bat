@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 set CMD=%1
 
-if "%CMD%"=="server" (
+if "%CMD%"=="" (
     py manage.py runserver
     exit /b
 )
@@ -31,7 +31,7 @@ if "%CMD%"=="migrate" (
 )
 
 if "%CMD%"=="venv" (
-    cmd /k "venv\Scripts\activate"
+    cmd /k ".venv\Scripts\activate"
     exit /b
 )
 
