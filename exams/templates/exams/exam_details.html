@@ -27,16 +27,16 @@ Exam Details: {{exam.display_title}}
         <span><b>Total Marks:</b> {{ exam.total_marks|floatformat:0 }}</span>
     </div>
 
-<a href="{% if attempts or request.user.is_superuser %}{% url 'question_paper' exam.exam_id %}{% else %}#{% endif %}"
-   class="btn-custom btn-lg fw-semibold px-5"
-   {% if not attempts and not request.user.is_superuser %}
-       title="You must attempt the exam first"
-       onclick="alert('You must attempt exam first'); return false;"
-       style="background-color: #6c757d;cursor:not-allowed"
-   {% endif %}>
-    View Paper
-</a>
-    <button class="btn-custom btn-lg px-5" style="background-color: #6c757d;" disabled>Take Exam</button>
+    <a href="{% if attempts or request.user.is_superuser %}{% url 'question_paper' exam.exam_id %}{% else %}#{% endif %}"
+        class="btn-custom btn-lg fw-semibold px-5" {% if not attempts and not request.user.is_superuser %}
+        title="You must attempt the exam first" onclick="alert('You must attempt exam first'); return false;"
+        style="background-color: #6c757d;cursor:not-allowed" {% endif %}>
+        View Paper
+    </a>
+    <a href="{% url 'exam_prep' exam.exam_id %}" class="btn-custom btn-lg fw-semibold px-5">
+        Take Exam
+    </a>
+    <!-- <button class="btn-custom btn-lg px-5" style="background-color: #6c757d;" disabled>Take Exam</button> -->
 </div>
 
 
@@ -53,7 +53,7 @@ Exam Details: {{exam.display_title}}
                 <h5>Exam Details</h5>
                 <div class="d-flex flex-column align-items-start flex-wrap gap-1 mt-3 mb-3">
                     <span><b>Sections:</b> {{ stats.sections }}</span>
-                    <span>{% if stats.apti_count %}<b>Aptitude Qs:</b> {{ stats.apti_count }} | 
+                    <span>{% if stats.apti_count %}<b>Aptitude Qs:</b> {{ stats.apti_count }} |
                         {% endif %}<b>Technical Qs</b>: {{ stats.tech_count }}</span>
                     <span><b>Total Questions:</b> {{exam.total_questions}}</span>
                     <span><b>1M Qs:</b> {{ stats.1m_count }} ({{ stats.1m_marks }} marks) |
@@ -69,8 +69,9 @@ Exam Details: {{exam.display_title}}
                 <span class="{% if attempts or request.user.is_superuser %} d-none{% endif %}">
                     Stats unlock after attempting exam
                 </span>
-                <div class="d-flex gap-3 {% if not attempts and not request.user.is_superuser %} text-muted {% endif %}">
-                    
+                <div
+                    class="d-flex gap-3 {% if not attempts and not request.user.is_superuser %} text-muted {% endif %}">
+
                     <div class="d-flex flex-column">
                         <b>Total Takes</b>
                         <span class="{% if not attempts and not request.user.is_superuser %} blurred {% endif %}">
@@ -119,16 +120,15 @@ Exam Details: {{exam.display_title}}
 
                     <!-- Question heat element -->
                     {% if not attempts and not request.user.is_superuser %}
-                        <a href="#"
+                    <a href="#"
                         class="text-decoration-none d-flex align-items-center justify-content-center text-dark fw-bold rounded shadow-sm"
                         style="background-color: whitesmoke;
                             width: calc(9% - 0.5rem);aspect-ratio: 1/1; font-size: 0.9rem; transition: transform 0.1s;"
-                        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"
-                        >
+                        onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                         {{ eq.original_order|default:forloop.counter }}
                     </a>
                     {% else %}
-                    
+
                     <a target="_blank" href="{% url 'view_question' eq.question_id %}"
                         class="text-decoration-none d-flex align-items-center justify-content-center text-dark fw-bold rounded shadow-sm"
                         style="--heat: {{ eq.heat_map_color|default:'#e0e0e0' }};background-color: var(--heat);
@@ -183,7 +183,10 @@ Exam Details: {{exam.display_title}}
                                 {{ attempt.submitted_at }}
                             </small>
                         </div>
-                        <span class="badge bg-primary fs-6">Rank: {{ attempt.historical_rank|default:"-" }}</span>
+                        <div class="d-flex flex-row gap-1">
+                            <span class="badge border-2 border-info-subtle border fs-6">Marks: {{ attempt.marks_obtained|default:"-" }}</span>
+                            <span class="badge border-1 border-info border  fs-6">Rank: {{ attempt.historical_rank|default:"-" }}</span>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mt-3">
@@ -211,9 +214,9 @@ Exam Details: {{exam.display_title}}
     <div class="col-12">
         <div class="card p-4 shadow-sm">
             <h4 class="mb-3">Top Performers</h4>
-            {% if not attempts and not superuser %} Attempt exam to see Top Performers {% endif %}
+            {% if not attempts and not request.user.is_superuser %} Attempt exam to see Top Performers {% endif %}
             {% if exam_toppers %}
-            <div class="table-responsive {% if not attempts and not superuser %} d-none {% endif %}">
+            <div class="table-responsive {% if not attempts and not request.user.is_superuser %} d-none {% endif %}">
                 <table class="table table-striped table-hover align-middle mb-0">
                     <thead>
                         <tr>

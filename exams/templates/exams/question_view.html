@@ -9,8 +9,8 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
 
 
 {% block head_js %}
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script src="{% static 'js/register_with_math_jax.js' %}"></script>
+<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+<script src="{% static 'js/load_math_jax.js' %}"></script>
 
 {% endblock %}
 
@@ -57,9 +57,9 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
             </a>
             <div title="Toppers (Top 10%) average accuracy for this question in this exam">
                 Toppers Accuracy of this question in this exam:
-            <span class="fw-semibold"
-                style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }};color:var(--local-color)">{{eq.accuracy_percent}}%
-            </span>
+                <span class="fw-semibold"
+                    style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }};color:var(--local-color)">{{eq.accuracy_percent}}%
+                </span>
             </div>
             <hr>
         </div>

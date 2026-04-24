@@ -7,14 +7,14 @@ Test Series Engine
 
 
 {% block head_css %}
-<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="/static/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
 {% endblock %}
 
 {% block head_js %}
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="/static/js/jquery-3.7.0.min.js"></script>
+<script src="/static/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/dataTables.bootstrap5.min.js"></script>
 {% endblock %}
 
 {% block page_content %}
@@ -75,6 +75,19 @@ Test Series Engine
             <hr>
             <a href="{% url 'upload_package' %}" class="btn-custom w-100 mb-3">Upload Package Data</a>
             <a class="btn-custom w-100 mb-3" href="{% url 'upload_attempts' %}">Upload Attempt Data</a>
+            <a class="btn-custom w-100 mb-3" href="{% url 'upload_pyq_package' %}">Upload PYQ Data</a>
+            <a href="{% url 'pyq_explorer' %}" class="btn-custom w-100 mb-3">Practice PYQ's</a>
+        </div>
+
+    </div>
+
+    {% else %}
+    <div class="col-md-4">
+
+        <div class="card p-4 shadow-sm h-100">
+            <h4>Controls</h4>
+            <hr>
+            <a href="{% url 'pyq_explorer' %}" class="btn-custom w-100 mb-3">Practice PYQ's</a>
         </div>
 
     </div>

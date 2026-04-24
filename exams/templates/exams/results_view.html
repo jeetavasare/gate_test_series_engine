@@ -9,8 +9,8 @@ Result: {{exam.display_title}}
 
 
 {% block head_js %}
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script src="{% static 'js/register_with_math_jax.js' %}"></script>
+<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+<script src="{% static 'js/load_math_jax.js' %}"></script>
 
 {% endblock %}
 
@@ -442,6 +442,9 @@ Result: {{exam.display_title}}
                     <div class="pill-small custom-bg-dark">
                         Time: <span class="{{eq.time_taken_class}}">{{ eq.formatted_time_taken }}</span>
                     </div>
+                    <div class="pill-small custom-bg-dark" title="State of this question at the time of submission">
+                        Status: {{ eq.q_status }}
+                    </div>
                     <div>
                         <a target="_blank" class="btn-custom pill-small"
                             href="https://gateoverflow.in/{{ eq.question.q_id }}">Discuss</a>
@@ -449,6 +452,7 @@ Result: {{exam.display_title}}
                 </div>
             </div>
             {% endfor %}
+            <div class="mt-5 mb-5"></div>
             {% endfor %}
         </div>
     </div>
@@ -461,7 +465,8 @@ Result: {{exam.display_title}}
 {% endblock %}
 
 {% block end_js %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+<script src="/static/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
 <script src="{% static 'js/auto_format_date.js' %}"></script>
 {% endblock %}
