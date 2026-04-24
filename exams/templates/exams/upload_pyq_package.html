@@ -1,0 +1,48 @@
+{% extends 'exams/centered_template.html' %}
+{% block page_content %}
+<div class="mb-4">
+    <a href="{% url 'home' %}" class="btn-custom mb-3">&larr; Back to Home</a>
+    <h2>Upload Pyq Package (Admin Only)</h2>
+</div>
+
+{% if result %}
+<div class="alert alert-success">
+    <h5>Upload Complete</h5>
+    <p>Exams Inserted: {{ result.exams_processed }}</p>
+    <p>Questions Inserted: {{ result.questions_processed }}</p>
+    {% if result.skipped_exam_ids %}
+    <p class="mb-0 text-warning"><strong>Skipped IDs (Missing in 1+ sources):</strong> {{ result.skipped_exam_ids|join:", " }}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card p-4 shadow-sm">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Package Code (e.g., CS26)</label>
+                <input type="text" name="package_code" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label>Package Name (e.g., Test series CS 2026)</label>
+                <input type="text" name="package_name" class="form-control" required>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <label>GATE Mock Results (JSON)</label>
+            <input type="file" name="results" class="form-control" accept=".json" required>
+        </div>
+        <div class="mb-3">
+            <label>CS Tests / God Tier File (JSON)</label>
+            <input type="file" name="cs_tests" class="form-control" accept=".json" required>
+        </div>
+        <button type="submit" class="btn-custom w-100 mt-3">Process Package</button>
+    </form>
+</div>
+{% endblock %}
