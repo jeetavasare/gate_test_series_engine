@@ -73,9 +73,9 @@ Que Paper: {{exam.display_title}}
                     data-qid="{{ eq.question.q_id }}">📄 </button>
             </div>
 
-            {% if eq.accuracy_percent %}
-            <div class="text-muted small">
-                <strong>Accuracy:</strong> {{ eq.accuracy_percent }}%
+            {% if 1 %}
+            <div class="text-muted small" title="Toppers (Top 10%) average accuracy for this question in this exam">
+                Toppers Accuracy: <b>{{ eq.accuracy_percent }}%</b>
             </div>
             {% endif %}
 

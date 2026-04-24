@@ -384,10 +384,13 @@ Result: {{exam.display_title}}
     <div class="tab-pane fade" id="questions" role="tabpanel" tabindex="0">
         <div class="col-12">
             {% for section_name, data in sections.items %}
-            <div class="mt-2 pb-2">
+            <div class="border border-info mt-2 pb-2 px-3 py-2 rounded-2">
                 <h3 class="mb-0 text-info">{{ section_name }}</h3>
-                <span class="text-muted small">{{ data.questions|length }} Questions | {{ data.marks|floatformat:0 }}
-                    marks</span>
+                <span class="text-muted small fw-bold">
+                    {{ data.questions|length }} Questions 
+                    | {{ data.marks_obtained|floatformat:2 }}/{{ data.marks|floatformat:0 }}marks
+                    | Time: {{data.time_spent_secs}}
+                </span>
             </div>
 
             <hr class="m-0 p-2" style="border-color: var(--border-color);">
@@ -414,9 +417,9 @@ Result: {{exam.display_title}}
                     <button class="btn btn-sm btn-outline-secondary copy-btn" title="Copy question text" data-user-answer="{{eq.user_ans}}"
                         data-qid="{{ eq.question.q_id }}">📄</button>
                 </div>
-                {% if eq.accuracy_percent %}
-                <div class="text-muted small">
-                    <strong>Accuracy:</strong> {{ eq.accuracy_percent }}%
+                {% if 1 %}
+                <div class="text-muted small" title="Toppers (Top 10%) average accuracy for this question in this exam">
+                    Toppers Accuracy: <b>{{ eq.accuracy_percent }}%</b>
                 </div>
                 {% endif %}
 

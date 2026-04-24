@@ -31,17 +31,20 @@ def process_attempts_upload(user, results_file, html_files):
         
         exam_link_el = soup.select_one('.exam_name h2 a')
         if not exam_link_el or not exam_link_el.has_attr('href'):
+            print("exam link not present", exam_link_el)
             skipped_files += 1
             continue
             
         exam_id_match = re.search(r'/exam/(\d+)', exam_link_el['href'])
         if not exam_id_match:
+            print("exam id not match", exam_id_match)
             skipped_files += 1
             continue
             
         exam_id = int(exam_id_match.group(1))
 
         if exam_id not in valid_db_exam_ids:
+            print("exam not in valid exams", exam_id)
             skipped_files += 1
             continue
 
@@ -82,11 +85,12 @@ def process_attempts_upload(user, results_file, html_files):
                 time_sec = (mins * 60) + secs
 
             # Append as an object
-            responses.append({
-                'q_id': q_id,
-                'ans': ans,
-                'time_sec': time_sec
-            })
+            # responses.append({
+            #     'q_id': q_id,
+            #     'ans': ans,
+            #     'time_sec': time_sec
+            # })
+            responses.append([q_id,ans,time_sec, 0])
 
         json_match = json_attempts_map.get((exam_id, total_time_mins))
         

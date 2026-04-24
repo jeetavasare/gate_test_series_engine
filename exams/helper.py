@@ -34,8 +34,8 @@ def replace_question_image_link(question_html):
 
 def calculate_attempt_performance(exam, attempt, exam_questions, user_responses):
     sections = {
-        'General Aptitude': {'questions': [], 'marks': 0}, 
-        'Technical': {'questions': [], 'marks': 0}
+        'General Aptitude': {'questions': [], 'marks': 0, 'marks_obtained': 0, 'time_spent_secs': 0}, 
+        'Technical': {'questions': [], 'marks': 0, 'marks_obtained': 0, 'time_spent_secs': 0}
     }
     total_marks_obtained = 0.0
 
@@ -87,6 +87,7 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
             eq.time_taken_class = 'text-warning'
         # Assign order for Python sorting (Future shuffle proof)
         eq.display_order = resp.get('presented_order', eq.original_order or q_id)
+        eq.q_status = resp.get('q_status')
         
         try:
             eq.formatted_time_taken = time_seconds_to_mins_seconds(eq.time_taken_sec)
@@ -98,7 +99,8 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
         marks_award = eq.question.marks_award
         marks_penalty = eq.question.marks_penalty 
         question_category = eq.question.category
-
+        correct_answer = eq.question.correct_answer
+        is_correct = False
         m_key = f"{int(marks_award)}m"
         perf[f'{m_key}_total_q'] += 1
         perf[f'{m_key}_total_m'] += marks_award
@@ -120,7 +122,18 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
 
             subject_wise_break_down[question_category]['total_attempts'] += 1
             
-            if eq.user_ans == eq.question.correct_answer:
+            if ":" in correct_answer:
+                try:
+                    min_val, max_val = map(float, correct_answer.split(':'))
+                    if min_val <= float(eq.user_ans) <= max_val:
+                        is_correct = True
+                except:
+                    pass
+            else:
+                if correct_answer == eq.user_ans:
+                    is_correct = True
+
+            if is_correct:
                 subject_wise_break_down[question_category]['total_correct'] += 1
                 subject_wise_break_down[question_category]['marks_scored'] += marks_award
                 total_marks_obtained += marks_award
@@ -140,16 +153,33 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
             eq.ans_status = 'Skipped'
 
         if 'aptitude' in eq.question.category.lower():
+            # HERE WE DO NOT ACCOUNT FOR MARKS FOR ALL QUESTION
+            if is_correct:
+                sections['General Aptitude']['marks_obtained'] += marks_award
+            else:
+                sections['General Aptitude']['marks_obtained'] -= marks_penalty
+
             sections['General Aptitude']['questions'].append(eq)
             sections['General Aptitude']['marks'] += eq.question.marks_award
+            
+            sections['General Aptitude']['time_spent_secs'] += eq.time_taken_sec
         else:
+            # HERE WE DO NOT ACCOUNT FOR MARKS FOR ALL QUESTION
+            if is_correct:
+                sections['Technical']['marks_obtained'] += marks_award
+            else:
+                sections['Technical']['marks_obtained'] += marks_penalty
             sections['Technical']['questions'].append(eq)
             sections['Technical']['marks'] += eq.question.marks_award
+
+            sections['Technical']['time_spent_secs'] += eq.time_taken_sec
 
         subject_wise_break_down[question_category]['count'] += 1
         subject_wise_break_down[question_category]['total_marks'] += marks_award
 
-
+    sections['General Aptitude']['time_spent_secs'] = time_seconds_to_mins_seconds(sections['General Aptitude']['time_spent_secs'])
+    sections['Technical']['time_spent_secs'] = time_seconds_to_mins_seconds(sections['Technical']['time_spent_secs'])
+    
     # Create a reverse mapping for O(1) pool lookup, {Subject: Poolname}
     subject_to_pool = {sub: pool for pool, subs in pool_mapping.items() for sub in subs}
 

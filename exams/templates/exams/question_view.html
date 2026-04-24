@@ -55,7 +55,8 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
             <a target="_blank" href="{% url 'exam_details' eq.exam.exam_id %}" class="text-decoration-none text-reset">
                 <h5 class="mb-1">{{ eq.exam.display_title }}</h5>
             </a>
-            Average Accuracy of this question:
+            <div title="Toppers (Top 10%) average accuracy for this question in this exam">
+                Toppers Accuracy of this question in this exam:
             <span class="fw-semibold"
                 style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }};color:var(--local-color)">{{eq.accuracy_percent}}%
             </span>
