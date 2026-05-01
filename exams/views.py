@@ -378,7 +378,8 @@ def backfill_all_attempts_marks(request):
                 eq.question.q_id: {
                     'correct': eq.question.correct_answer,
                     'award': float(eq.question.marks_award),
-                    'penalty': float(eq.question.marks_penalty)
+                    'penalty': float(eq.question.marks_penalty),
+                    'q_type': eq.question.q_type
                 } for eq in eqs
             }
         
@@ -415,6 +416,9 @@ def backfill_all_attempts_marks(request):
                         else:
                             if user_ans == correct_ans:
                                 is_correct = True
+                            elif q_data['q_type'] == question_type_short_form_rev["NAT"]:
+                                if float(user_ans) == float(correct_ans):
+                                    is_correct = True
 
                         if is_correct:
                             total_marks += q_data['award']

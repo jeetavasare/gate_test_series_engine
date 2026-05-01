@@ -99,6 +99,7 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
         marks_award = eq.question.marks_award
         marks_penalty = eq.question.marks_penalty 
         question_category = eq.question.category
+        q_type = eq.question.q_type
         correct_answer = eq.question.correct_answer
         is_correct = False
         m_key = f"{int(marks_award)}m"
@@ -132,6 +133,10 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
             else:
                 if correct_answer == eq.user_ans:
                     is_correct = True
+                elif q_type == question_type_short_form_rev["NAT"]:
+                    # additional check for NAT - if answered like .4 instead of 0.4
+                    if(float(correct_answer) == float(eq.user_ans)):
+                        is_correct = True
 
             if is_correct:
                 subject_wise_break_down[question_category]['total_correct'] += 1

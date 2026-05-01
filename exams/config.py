@@ -147,6 +147,7 @@ pool_mapping = {
 
 q_types_list = ["Multiple Choice", "Multiple Select", "Numerical"]
 question_type_short_form = {"Multiple Choice": "MCQ", "Multiple Select": "MSQ", "Numerical": "NAT"}
+question_type_short_form_rev = {"MCQ": "Multiple Choice", "MSQ": "Multiple Select", "NAT": "Numerical"}
 
 interface_behavior = {
     "test": 
