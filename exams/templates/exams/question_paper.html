@@ -88,7 +88,8 @@ Que Paper: {{exam.display_title}}
             <hr>
             <div class="d-flex gap-3 align-items-center">
                 <div class="custom-bg-dark pill-small">
-                    Correct Answer: {{ eq.question.correct_answer }}
+                    Correct Answer:
+                    <span class="ans-content blurred" style="cursor: pointer;" data-answer="{{ eq.question.correct_answer }}">XX</span>
                 </div>
                 <div>
                     <a target="_blank" class="btn-custom pill-small"
@@ -108,4 +109,5 @@ Que Paper: {{exam.display_title}}
 {% block end_js %}
 <script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
 <script src="{% static 'js/auto_format_date.js' %}"></script>
+<script src="{% static 'js/answer_container_blurrer.js' %}"></script>
 {% endblock %}
