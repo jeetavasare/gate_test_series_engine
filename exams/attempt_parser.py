@@ -2,7 +2,7 @@ import json
 import re
 from bs4 import BeautifulSoup
 from django.db import transaction
-from .models import Attempt, Exam
+from .models import Attempt, Exam, TestPackage
 
 def process_attempts_upload(user, results_file, html_files):
     results_data = json.load(results_file)
@@ -114,3 +114,66 @@ def process_attempts_upload(user, results_file, html_files):
         "attempts_inserted": len(attempts_to_create),
         "skipped_files": skipped_files
     }
+
+
+# can parse only single attempt per exam, and the latest one that's the limitation
+# since we don't scan html files to do the mny attemtps for single exam thingy
+# which is fine since for pyq i have single attempts any ways
+def process_pyq_attempts_upload(user, results_file):
+    result_data = json.load(results_file)
+
+    try:
+        pyq_package = TestPackage.objects.get(code__iexact='PYQ')
+        valid_db_exam_ids = set(Exam.objects.filter(packages=pyq_package).values_list('exam_id', flat=True))
+    except TestPackage.DoesNotExist:
+        valid_db_exam_ids = set()
+
+    skipped_exams = []
+    skipped_due_to_no_results = 0
+    attempts_to_create = []
+    
+    for attempt in result_data:
+        exam_id = int(attempt.get('exam_id'))
+        
+        if exam_id not in valid_db_exam_ids:
+            skipped_exams.append({"exam_id": exam_id})
+            continue
+            
+        results_list = attempt.get('results')
+        if not results_list:
+            skipped_due_to_no_results += 1
+            continue
+            
+        results = results_list[0]
+
+        responses = []
+        # Target the values of the dictionary to get the arrays of questions
+        questions_dict = attempt.get('questions', {})
+        for section_questions in questions_dict.values():
+            for que in section_questions:
+                q_id = int(que['link'].rstrip('/').split('/')[-1])
+                answer = que.get('your_answer')
+                time_taken_secs = int(que['time_taken'][:2]) * 60 + int(que['time_taken'][6:8])
+                que_status = 0
+                responses.append([q_id, answer, time_taken_secs, que_status])
+
+        attempts_to_create.append(Attempt(
+            user=user,
+            exam_id=exam_id,
+            submitted_at=results.get('submitted_at_utc'),
+            time_taken_mins=results.get('time_taken_mins', 0),
+            historical_rank=results.get('rank'),
+            responses=json.dumps(responses)
+        ))
+
+    with transaction.atomic():
+        Attempt.objects.bulk_create(attempts_to_create)
+        
+    print(skipped_exams, skipped_due_to_no_results)
+    return {
+        "success": True,
+        "attempts_inserted": len(attempts_to_create),
+        "skipped_files": len(skipped_exams) + skipped_due_to_no_results,
+    }
+        
+        

@@ -76,6 +76,7 @@ Test Series Engine
             <a href="{% url 'upload_package' %}" class="btn-custom w-100 mb-3">Upload Package Data</a>
             <a class="btn-custom w-100 mb-3" href="{% url 'upload_attempts' %}">Upload Attempt Data</a>
             <a class="btn-custom w-100 mb-3" href="{% url 'upload_pyq_package' %}">Upload PYQ Data</a>
+            <a class="btn-custom w-100 mb-3" href="{% url 'upload_pyq_attempts' %}">Upload PYQ Attempt Data</a>
             <a href="{% url 'pyq_explorer' %}" class="btn-custom w-100 mb-3">Practice PYQ's</a>
         </div>
 
@@ -88,6 +89,7 @@ Test Series Engine
             <h4>Controls</h4>
             <hr>
             <a href="{% url 'pyq_explorer' %}" class="btn-custom w-100 mb-3">Practice PYQ's</a>
+            <a href="{% url 'my_exam_attempts' %}" class="btn-custom w-100 mb-3">My Attempts</a>
         </div>
 
     </div>
@@ -122,7 +124,7 @@ Test Series Engine
 
                         {% for exam in exams %}
                         <tr>
-                            <td><a target="_blank" href="{% url 'exam_details' exam.exam_id %}" class="text-decoration-none text-info fw-bold">{{ exam.display_title }}</a></td>
+                            <td><a  href="{% url 'exam_details' exam.exam_id %}" class="text-decoration-none text-info fw-bold">{{ exam.display_title }}</a></td>
                             <td>{{ exam.created_date|slice:":10" }}</td>
                             <td>{{ exam.total_questions }}</td>
                             <td>{{ exam.total_marks }}</td>

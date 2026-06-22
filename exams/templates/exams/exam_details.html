@@ -177,6 +177,11 @@ Exam Details: {{exam.display_title}}
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
                             <strong>Attempt #{{ forloop.revcounter }}</strong>
+                            
+                            {% if attempt.historical_rank %}
+                                <span class="ms-2 badge border-1 border-danger border" title="GO classes test series attempt result">GO Result</span>
+                            {% endif %}
+                                
                             <br>
                             <small class="text-muted get-exam-start-time" data-base="{{ attempt.submitted_at }}"
                                 data-mins="{{ attempt.time_taken_mins }}">
@@ -185,7 +190,11 @@ Exam Details: {{exam.display_title}}
                         </div>
                         <div class="d-flex flex-row gap-1">
                             <span class="badge border-2 border-info-subtle border fs-6">Marks: {{ attempt.marks_obtained|default:"-" }}</span>
-                            <span class="badge border-1 border-info border  fs-6">Rank: {{ attempt.historical_rank|default:"-" }}</span>
+                            
+                            {% if  attempt.historical_rank %}
+                                <span class="badge border-1 border-info border  fs-6">Rank: {{ attempt.historical_rank|default:"-" }} / {{exam.total_takes}}</span>
+                            {% endif %}
+                                
                         </div>
                     </div>
 
@@ -232,7 +241,7 @@ Exam Details: {{exam.display_title}}
                             <td>#{{ forloop.counter }}</td>
                             <td>
                                 <a href="{{ entry.topper.profile_link }}" target="_blank"
-                                    class="text-decoration-none text-info fw-bold">
+                                    class="text-decoration-none fw-bold">
                                     {{ entry.topper.name }}
                                 </a>
                             </td>

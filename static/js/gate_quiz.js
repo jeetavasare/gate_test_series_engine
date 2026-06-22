@@ -48,9 +48,6 @@ function initiateSyncQueueProcessor() {
 
         isSyncing = true;
 
-        // Simulate GATE lag/freeze: Engage invisible/white overlay
-        $('#ui-lock-overlay').show();
-
         // Copy queue and clear original
         const batch = [...syncQueue];
         syncQueue = [];
@@ -85,7 +82,7 @@ function initiateSyncQueueProcessor() {
             // Put failed operations back at the front of the queue to preserve chronological order
             syncQueue = [...batch, ...syncQueue];
 
-            // Leave UI locked if server didn't respond 200, as requested.
+            // Leave UI locked if server didn't respond 200
             // Add a slight delay before allowing the worker to try the same batch again.
             setTimeout(() => { isSyncing = false; }, 2000);
         }
@@ -134,11 +131,9 @@ function typesetMathJaxOnQuestionHtml() {
     const target = document.querySelector('#question-html');
     if (!target) return;
 
-    // 1. Clear the previous MathJax cache for this specific container
     if (MathJax.typesetClear) {
         MathJax.typesetClear([target]);
     }
-    // 2. Use the promise-based typeset as the error message instructed
     if (MathJax.typesetPromise) {
         MathJax.typesetPromise([target]).catch((err) => {
             console.error('MathJax typesetting failed:', err.message);
@@ -160,7 +155,7 @@ function getCurrentQuestionAnswer() {
         return $holder.find('input[type="checkbox"]:checked').map(function () {
             return $(this).val();
         }).get();
-        
+
 
     } else if ($holder.find('input[type="text"]').length > 0) {
         return $holder.find('input[type="text"]').val();
@@ -203,7 +198,7 @@ function recomputeAggregates() {
             }
         });
 
-        // Overwrite the specific section aggregate with new totals
+        // Overwrite 
         sectionAggregates[index] = sectionAgg;
     });
 
@@ -317,7 +312,7 @@ function setupCandidateDetails(data) {
                 ${tspans}
             </text>
             </svg>
-            `; 
+            `;
     $('.question-holder-area').css('background-image', `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
 
 }
@@ -414,9 +409,6 @@ function orchestrateSectionChange() {
     updateSidePanelQuestionStatusIndicatorList()
 
     updateQuestionAreaWithJitter()
-
-    // unLockUI(UILockReason["QUESTION_SWITCH"])
-
 }
 
 
@@ -457,7 +449,6 @@ function orchestrateQuestionSwitch(reason, new_question_index = -1) {
     }
 
 
-
     // Decide status change for new_question: becuase if status is not_visited it should become visited
     const new_question_status = section.questions[new_question_index].status
     const new_status = (new_question_status == "not_visited") ? "not_answered" : new_question_status
@@ -472,8 +463,6 @@ function orchestrateQuestionSwitch(reason, new_question_index = -1) {
     updateSidePanelAggregates()
     updateSidePanelQuestionStatusIndicatorList()
     updateQuestionAreaWithJitter()
-
-
 }
 
 // Individual Update Functions
@@ -611,24 +600,20 @@ function renderAnswerArea(question_type) {
     const $holder = $('<span id="current-question-response-holder" style="display:flex;margin-top:50px"></span>');
     const options = ['A', 'B', 'C', 'D'];
 
-    // 1. Retrieve the saved answer
     const { section } = getCurrentIndexSection();
     const saved_answer = getActiveQuestion(section).user_ans;
 
     if (question_type === 'MCQ') {
         options.forEach(opt => {
-            // 2. Add 'checked' if saved_answer is an array and contains this option
             const isChecked = (typeof (saved_answer) == 'string' && saved_answer == opt) ? 'checked' : '';
             $holder.append(`<label><input type="radio" name="answer_input" value="${opt}" ${isChecked}> ${opt}</label>`);
         });
     } else if (question_type === 'MSQ') {
         options.forEach(opt => {
-            // 2. Add 'checked' if saved_answer is an array and contains this option
             const isChecked = (Array.isArray(saved_answer) && saved_answer.includes(opt)) ? 'checked' : '';
             $holder.append(`<label><input type="checkbox" name="answer_input" value="${opt}" ${isChecked}> ${opt}</label>`);
         });
     } else if (question_type === 'NAT') {
-        // 3. Inject the string value if it exists, otherwise leave empty
         const nat_value = (typeof saved_answer === 'string') ? saved_answer : '';
         $holder.append(`
             <script>triggerKeyboard(1, true)</script>
@@ -643,7 +628,6 @@ function renderAnswerArea(question_type) {
         return;
     }
 
-    // Inject into the parent area, replacing any existing content
     $('#question-response-area').html($holder);
 }
 function confirm_submit_exam() {
@@ -724,7 +708,6 @@ function setUpSectionPillEventListerner() {
 
         if (!isNaN(index)) {
             StateManager.update(["current_section_index"], index)
-            // data.session_recording.current_section_index = index;
         }
 
         orchestrateSectionChange()
@@ -735,8 +718,6 @@ function attachSidePanelEventListeners() {
 
     $('.question_area').on('click', '.sp-indicator', function (event) {
         // 'this' refers to the specific .sp-indicator that was clicked
-        // const current_section_index = data.session_recording.current_section_index
-        // const section = data.session_recording.sections[current_section_index]
         const { section_index, section } = getCurrentIndexSection()
 
         const question_id = this.attributes["data-q-id"].value
@@ -772,8 +753,6 @@ function addExamControlButtonsEventListener() {
         }
 
         const new_question_index = (old_question_index + 1) % (section.questions.length)
-
-
         orchestrateQuestionSwitch(QuestionSwitchReason["SAVE_AND_NEXT_BUTTON"], new_question_index)
 
     });
@@ -804,7 +783,6 @@ function addExamControlButtonsEventListener() {
         orchestrateQuestionSwitch(QuestionSwitchReason["MARK_FOR_REVIEW_BUTTON"], new_question_index)
 
     });
-
 
     $('#previous').on('click', () => {
         const { section_index, section } = getCurrentIndexSection()
@@ -851,6 +829,39 @@ function examSubmitControlEventListeners() {
         $("#confirm_exam_submit_overlay").css("display", "none");
     });
 }
+function collapseableSidePanelListners() {
+    // Initial state (optional: set based on current display)
+    if ($('.collapsible-question-panel').css('display') === 'flex') {
+        $('.expand_icon').css('display', 'none');
+        $('.collapse_icon').css('display', 'inline');
+    } else {
+        $('.expand_icon').css('display', 'inline');
+        $('.collapse_icon').css('display', 'none');
+    }
+
+    // Click handler (adjust selector to whatever should trigger toggle)
+    $('.expand_icon, .collapse_icon').on('click', function () {
+
+        let panel = $('.collapsible-question-panel');
+
+        if (panel.css('display') === 'none') {
+            // Show panel
+            panel.css('display', 'flex');
+
+            $('.expand_icon').css('display', 'none');
+            $('.collapse_icon').css('display', 'inline');
+
+        } else {
+            // Hide panel
+            panel.css('display', 'none');
+
+            $('.expand_icon').css('display', 'inline');
+            $('.collapse_icon').css('display', 'none');
+        }
+
+    });
+
+}
 
 // Interface Behavior Controls
 function applyAntiCheatLocks() {
@@ -859,11 +870,9 @@ function applyAntiCheatLocks() {
     // 1. Disable Right-Click Menu
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-
     // 2. Intercept Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
         e.preventDefault(); // all keyboard inputs neglected
-        // Block DevTools, View Source, Print, Save, Copy
         if (
             e.key === 'F12' ||
             (e.ctrlKey && e.shiftKey && e.key === 'I') || // DevTools (Windows)
@@ -878,13 +887,12 @@ function applyAntiCheatLocks() {
             return false;
         }
 
-        // 3. Strict NAT Input validation (Only numbers, decimals, minus, and control keys)
+        // 3. Strict NAT Input validation
         if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
             const isNumeric = (e.key >= '0' && e.key <= '9') || e.key === '.' || e.key === '-';
             const isControl = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key);
 
             // Allow Ctrl+A / Ctrl+V if you want, but strictly in exam you can only use the virtual keyboard.
-            // If you want to force ONLY the virtual keyboard, just e.preventDefault() everything here.
             if (!isNumeric && !isControl) {
                 e.preventDefault();
             }
@@ -894,7 +902,6 @@ function applyAntiCheatLocks() {
 function examInterfaceBehaviorEnforcement() {
     // 1. Mouse Scroll Disable
     if (data?.interface_behavior?.mouse_scrolling === false) {
-        // Blocks mouse wheel scrolling. Standard scrollbar dragging remains active.
         window.addEventListener('wheel', (e) => {
             e.preventDefault();
         }, { passive: false });
@@ -905,7 +912,6 @@ function examInterfaceBehaviorEnforcement() {
         $('#finalSubmit').on("click", () => {
             confirm_submit_exam();
         });
-
     }
 
 }
@@ -917,6 +923,7 @@ function setUpExamDetails(data) {
     setUpExamPill()
     setupSections()
 
+    collapseableSidePanelListners()
     addExamControlButtonsEventListener()
     setupScrollArrowListeners()
     examSubmitControlEventListeners()

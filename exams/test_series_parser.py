@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from django.db import transaction
 from .models import TestPackage, Exam, Question, Topper2026, ExamTopper, ExamQuestion
 
@@ -254,13 +254,23 @@ def process_pyq_package_upload(package_code, package_name, results_file, cs_test
         for eid in valid_exam_ids:
             cs_data = cs_tests_map[eid]
             mock_data = mocks_map[eid]
+            
+            title = cs_data.get('name', f"Exam {eid}")
+            
+            created_date = None
+            # Hunt for a 4-digit number starting with 19 or 20
+            year_match = re.search(r'\b(19\d{2}|20\d{2})\b', title)
+            if year_match:
+                year = int(year_match.group(1))
+                # 9:00 AM IST (UTC +5:30) = 3:30 AM UTC
+                created_date = datetime(year, 2, 1, 3, 30, 0, tzinfo=timezone.utc)
 
             exam = Exam(
                 exam_id=eid,
-                title=cs_data.get('name', f"Exam {eid}"),
+                title=title,
                 sec_exam_title=None, 
                 topics=None,
-                created_date=None,
+                created_date=created_date,
                 duration_mins=int(cs_data.get('duration', 0)),
                 total_marks=float(cs_data.get('total_marks', 0)),
                 total_questions=int(cs_data.get('total_qs', 0)),

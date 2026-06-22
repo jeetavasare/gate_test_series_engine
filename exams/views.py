@@ -6,8 +6,8 @@ from .test_series_parser import process_package_upload, process_pyq_package_uplo
 from .models import TestPackage, Exam, User, Question, Attempt, ExamQuestion
 import re
 from django.conf import settings
-from .helper import time_mins_to_hour_mins, calculate_attempt_performance, replace_question_image_link, ques_status_map_display
-from .attempt_parser import process_attempts_upload
+from .helper import time_mins_to_hour_mins, calculate_attempt_performance, replace_question_image_link, ques_status_map_display, parse_dt
+from .attempt_parser import *
 from django.http import JsonResponse, HttpResponseNotFound
 import json
 from django.shortcuts import get_object_or_404
@@ -15,6 +15,7 @@ from .config import *
 from django.db.models import Prefetch, Q
 import os
 from django.db import transaction
+from django.utils import timezone
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -219,7 +220,7 @@ def exam_details_view(request, exam_id):
     # Fetch toppers
     exam_toppers = exam.exam_toppers.all().select_related('topper').order_by('-marks', 'time_taken_mins')
 
-    # 2. Fetch the user's specific attempts for this exam
+    
     attempts = Attempt.objects.filter(exam=exam, user=request.user).order_by('-submitted_at')
 
     formatted_duration = time_mins_to_hour_mins(exam.duration_mins)
@@ -238,7 +239,7 @@ def exam_details_view(request, exam_id):
 @staff_member_required(login_url='home')
 def upload_attempts_view(request):
     users = User.objects.all()
-    context = {'users': users}
+    context = {'users': users, "require_html": True}
     
     if request.method == 'POST':
         target_user_id = request.POST.get('user_id')
@@ -276,7 +277,13 @@ def results_view(request, attempt_id):
         return HttpResponseNotFound("Resource not found")
 
     exam = attempt.exam
-    
+
+    # get all attempts to get this attempts relative order
+    attempts = Attempt.objects.filter(exam=exam, user=request.user).order_by('submitted_at')
+    attempt_num = 1
+    for i, _attempt in enumerate(attempts):
+        if _attempt.attempt_id == attempt_id:
+            attempt_num = i + 1
     # --- STRICT ARRAY PARSING LOGIC ---
     try:
         raw_responses = json.loads(attempt.responses) if attempt.responses else []
@@ -319,15 +326,28 @@ def results_view(request, attempt_id):
 
     medal = ''
     medal_title = ''
-    if perf['percentile'] >= 90:
-        medal = '🏆'
-        medal_title = "ACE - Enter top 10%"
-    if total_marks_obtained > (exam.highest_marks or 0):
-        medal = '🥇 🏆'
-        medal_title = "CONQUEROR"
+    if attempt.historical_rank:
 
+        if perf['percentile'] >= 90:
+            medal = '🏆'
+            medal_title = "ACE - Enter top 10%"
+        if total_marks_obtained > (exam.highest_marks or 0):
+            medal = '🥇 🏆'
+            medal_title = "CONQUEROR"
+    else:
+        if total_marks_obtained >= exam.top_10_avg_marks:
+            medal = '🏆'
+            medal_title = "ACE - Enter top 10%"
+        if total_marks_obtained > (exam.highest_marks or 0):
+            medal = '🥇 🏆'
+            medal_title = "CONQUEROR"
+            
+    go_result = False
+    if not attempt.historical_rank:
+        go_result = True
     context = {
         'attempt': attempt,
+        'attempt_num': attempt_num,
         'exam': exam,
         'sections': sections,
         'resultant_marks': total_marks_obtained,
@@ -338,7 +358,8 @@ def results_view(request, attempt_id):
         'medal': medal,
         'medal_title': medal_title,
         'subject_wise_break_down' : subject_wise_break_down,
-        'pooled_data': pooled_data
+        'pooled_data': pooled_data,
+        'go_result': go_result,
     }
     
     return render(request, 'exams/results_view.html', context)
@@ -363,8 +384,7 @@ def view_question(request, question_id):
 def backfill_all_attempts_marks(request):
     attempts_to_update = []
     
-    # Cache to store question data per exam so we don't query the DB in the loop
-    # Structure: { exam_id: { q_id: {'correct': 'A', 'award': 1.0, 'penalty': 0.33} } }
+        # Structure: { exam_id: { q_id: {'correct': 'A', 'award': 1.0, 'penalty': 0.33} } }
     exam_cache = {} 
     
     # Fetch all attempts that actually belong to an exam
@@ -386,11 +406,11 @@ def backfill_all_attempts_marks(request):
         q_dict = exam_cache[attempt.exam_id]
         total_marks = 0.0
         
-        # 2. Parse responses and calculate
+        # 2. parse responses and calculate
         try:
             raw_responses = json.loads(attempt.responses) if attempt.responses else []
             for item in raw_responses:
-                # Based on your new schema: [[q_id, ans, time_sec, status]]
+                # new schema: [[q_id, ans, time_sec, status]]
                 q_id = int(item[0])
                 user_ans = item[1]
                 
@@ -411,7 +431,7 @@ def backfill_all_attempts_marks(request):
                                 if min_val <= float(user_ans) <= max_val:
                                     is_correct = True
                             except ValueError:
-                                # Fails if user_ans is not a valid float
+                                # user_ans is not a valid float
                                 pass 
                         else:
                             if user_ans == correct_ans:
@@ -426,20 +446,21 @@ def backfill_all_attempts_marks(request):
                             total_marks -= q_data['penalty']
                             
         except (json.JSONDecodeError, IndexError, ValueError, TypeError) as e:
-            # Safely skip malformed JSON rows without killing the script
+
             print(f"Skipping attempt {attempt.attempt_id} due to parse error: {e}")
             continue
         
-        # 3. Assign and queue for update
+        # assign and queue for update
         attempt.marks_obtained = round(total_marks, 2)  # Rounding to prevent floating point drift
         attempts_to_update.append(attempt)
     
-    # 4. Perform a bulk update to save massive amounts of DB queries
+    
     if attempts_to_update:
         with transaction.atomic():
             Attempt.objects.bulk_update(attempts_to_update, ['marks_obtained'], batch_size=1000)
             
     print(f"Crawler finished. Successfully recalculated and updated {len(attempts_to_update)} attempts.")
+    return JsonResponse({"success": True})
 
 @staff_member_required(login_url='home')
 def upload_pyq_package_view(request):
@@ -555,3 +576,72 @@ def pyq_explorer(request):
         'error_msg': error_msg,
     }
     return render(request, 'exams/pyq_explorer.html', context)
+
+
+@login_required(login_url='login')
+def my_exam_attempts(request):
+    attempts = (Attempt.objects.filter(user=request.user).select_related('exam').order_by('-submitted_at'))
+
+    total_attempts = attempts.count()
+    total_exams_given = attempts.values('exam').distinct().count()
+    today = timezone.now().date()
+
+    grouped = {
+        "today": [],
+        "yesterday": [],
+        "earlier_this_week": [],
+        "last_week": [],
+        "this_month": [],
+        "last_month": [],
+        "earlier_this_year": [],
+        "long_time_ago": [],
+    }
+    for a in attempts:
+        dt = parse_dt(a.submitted_at)
+        days_diff = (today - dt.date()).days
+    
+
+        if days_diff == 0:
+            grouped["today"].append(a)
+        elif days_diff == 1:
+            grouped["yesterday"].append(a)
+        elif days_diff <= 6:
+            grouped["earlier_this_week"].append(a)
+        elif days_diff <= 13:
+            grouped["last_week"].append(a)
+        elif days_diff <= 29:
+            grouped["this_month"].append(a)
+        elif days_diff <= 60:
+            grouped["last_month"].append(a)
+        elif dt.year == today.year:
+            grouped["earlier_this_year"].append(a)
+        else:
+            grouped["long_time_ago"].append(a)
+
+    return render(request, "exams/my_exam_attempts.html", {
+        "grouped_attempts": grouped,
+        "total_attempts": total_attempts,
+        "total_exams_given" : total_exams_given
+    })
+
+
+@staff_member_required(login_url='home')
+def upload_pyq_attempts_view(request):
+    users = User.objects.all()
+    context = {'users': users, "require_html": False}
+    
+    if request.method == 'POST':
+        target_user_id = request.POST.get('user_id')
+        results_json = request.FILES.get('results_json')
+        
+        if target_user_id and results_json:
+            try:
+                user = User.objects.get(user_id=target_user_id)
+                result = process_pyq_attempts_upload(user, results_json)
+                context['result'] = result
+            except Exception as e:
+                context['error'] = f"Processing failed: {str(e)}"
+        else:
+            context['error'] = "All fields and files are required."
+            
+    return render(request, 'exams/upload_attempts.html', context)

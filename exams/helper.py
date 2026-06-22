@@ -2,6 +2,7 @@ import re
 from django.conf import settings
 from collections import defaultdict
 from .config import *
+from datetime import datetime
 
 def safe_div(num, den):
     return (num / den) if den else 0
@@ -303,3 +304,11 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
     sections = {k: v for k, v in sections.items() if v['questions']}
     
     return perf, sections, total_marks_obtained, dict(subject_wise_break_down), dict(pooled_data)
+
+
+def parse_dt(value):
+    # normalize timezone: +0000 → +00:00
+    if value.endswith('+0000'):
+        value = value[:-5] + '+00:00'
+
+    return datetime.fromisoformat(value)

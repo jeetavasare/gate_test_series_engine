@@ -40,9 +40,14 @@
             <input type="file" name="results_json" class="form-control" accept=".json" required>
         </div>
             
-        <div class="mb-4">
+        <div class="mb-4 {% if not require_html %}d-none{% endif %}">
             <label>Offline Exam HTML Files (Multiple Selection Allowed)</label>
-            <input type="file" name="html_files" class="form-control" accept=".html" multiple required>
+            <input type="file" name="html_files" 
+                class="form-control"
+                accept=".html"
+                multiple 
+                {% if require_html %}required{% endif %}
+            >
             <small class="text-muted mt-1 d-block">Hold CTRL/CMD to select multiple files at once.</small>
         </div>
         

@@ -104,6 +104,7 @@ pool_mapping = {
         "Combinatory",
         "Set Theory & Algebra",
         "Mathematical Logic",
+        "Graph Theory",
     ],
 
     "Theory": [
@@ -111,7 +112,6 @@ pool_mapping = {
         "Theory of Computation",
         "Digital Logic",
         "Compiler Design",
-        "Graph Theory",
     ],
 
     "Programming": [

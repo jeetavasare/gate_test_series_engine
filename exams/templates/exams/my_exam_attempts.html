@@ -1,0 +1,132 @@
+{% extends 'exams/centered_template.html' %}
+
+{% load static %}
+
+{% block page_title %}
+Your Attempts
+{% endblock %}
+
+{% block page_content %}
+
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div class="card p-4 shadow-sm h-100 d-flex flex-column">
+
+            <div class="mb-3">
+                <h3 class="mb-0">Your Attempts</h3>
+                <small class="text-muted text-">{{ total_attempts }} Total Attempts; {{ total_exams_given }} Unique Exams </small>
+            </div>
+
+            {% if grouped_attempts %}
+
+            <div class="flex-grow-1 overflow-auto">
+
+                <div class="d-flex flex-column gap-4">
+
+                    {% for group, attempts in grouped_attempts.items %}
+                    {% if attempts %}
+
+                    <div class="mb-2">
+                        <h6 class="mb-2 fs-5 text-primary-emphasis">
+                            {% if group == "today" %}Today
+                            {% elif group == "yesterday" %}Yesterday
+                            {% elif group == "earlier_this_week" %}Earlier This Week
+                            {% elif group == "last_week" %}Last Week
+                            {% elif group == "this_month" %}Earlier This Month
+                            {% elif group == "last_month" %}Last Month
+                            {% elif group == "earlier_this_year" %}Earlier This Year
+                            {% else %}A Long Time Ago
+                            {% endif %}
+                        </h6>
+
+                        <div class="d-flex flex-column gap-3">
+
+                            {% for attempt in attempts %}
+                            <div class="p-3 border rounded shadow-sm" style="background-color: var(--card-bg);">
+
+                                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                                    <div>
+
+                                        <div>
+                                            <div class="d-flex align-items-center flex-wrap">
+                                                {% if attempt.exam %}
+                                                <a href="{% url 'exam_details' attempt.exam.exam_id %}"
+                                                    class="text-decoration-none text-reset">
+                                                    <span class="mb-1 fw-bold fs-6">
+                                                        {{ attempt.exam.display_title }}
+                                                        <span />
+                                                </a>
+                                                {% else %}
+                                                <h5 class="mb-1">Unknown Exam</h5>
+                                                {% endif %}
+                                                {% if attempt.historical_rank %}
+                                                <span class="ms-2 badge border-1 border-danger border">
+                                                    GO Result
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <small class="text-muted get-exam-start-time"
+                                                data-base="{{ attempt.submitted_at }}"
+                                                data-mins="{{ attempt.time_taken_mins }}">
+                                                {{ attempt.submitted_at }}
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="d-flex flex-row gap-1 flex-wrap">
+                                        <span class="badge border-2 border-info-subtle border fs-6">
+                                            Marks: {{ attempt.marks_obtained|default:"-" }}
+                                            / {{attempt.exam.total_marks}}
+                                        </span>
+
+                                        {% if attempt.historical_rank and attempt.exam %}
+                                        <span class="badge border-1 border-info border fs-6">
+                                            Rank: {{ attempt.historical_rank }} / {{ attempt.exam.total_takes }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="small">
+                                        <span class="text-muted">Time:</span>
+                                        {{ attempt.time_taken_mins }}m / 
+                                        {{attempt.exam.duration_mins}}m
+                                    </div>
+
+                                    <a href="{% url 'results_view' attempt.attempt_id %}"
+                                        class="btn-custom btn-sm py-1 px-3">
+                                        View Result
+                                    </a>
+                                </div>
+
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+
+                    {% endif %}
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            {% else %}
+            <div class="text-muted border border-dashed border-secondary p-3 rounded h-100 d-flex align-items-center justify-content-center"
+                style="background-color: rgba(255,255,255,0.05);">
+                <p class="mb-0 fst-italic">No attempts recorded yet.</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block end_js %}
+<script src="{% static 'js/auto_format_date.js' %}"></script>
+{% endblock %}

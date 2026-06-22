@@ -17,4 +17,6 @@ urlpatterns = [
     path('recalculate_marks/', views.backfill_all_attempts_marks, name='recalculate_marks'),
     path('upload-pyq-package/', views.upload_pyq_package_view, name='upload_pyq_package'),
     path('pyq-explorer/', views.pyq_explorer, name='pyq_explorer'),
+    path('my-exam-attempts/', views.my_exam_attempts, name='my_exam_attempts'),
+    path('upload-pyq-attempts/', views.upload_pyq_attempts_view, name='upload_pyq_attempts'),
 ]

@@ -15,7 +15,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz</title>
-    <!-- <link rel="stylesheet" type="text/css" href="css/RightToLeft.css"> -->
     <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="js/jquery.corner.js"></script>
@@ -23,8 +22,6 @@
     <!-- <link rel="stylesheet" href="css/jquery-ui-1.10.4.custom.min.css"> -->
     <script src="js/virtual_keyboard.js"></script>
     <!-- <script type="text/javascript" src="js/calculatorcopyandpaste.js"></script> -->
-
-
 
 
     <link rel="stylesheet" href="css/style.css">
@@ -538,8 +535,6 @@
                                     }
                                 </style>
 
-
-
                                 <div onkeydown="javascript: keyboardDrag(event, this);" tabindex="0" role="dialog"
                                     aria-modal="false" aria-label="calculator" id="keyPad"
                                     class="calc_container complexFlag" style="width: 506px !important;">
@@ -877,57 +872,6 @@
                                                         10^(308).</li>
                                                 </ul> <br> <br>
                                             </span>
-                                            <span id="Japanese" style="display: none;">
-                                                <h3 style="text-align: center;">
-                                                    <strong>関数電卓の使い方</strong>
-                                                </h3> 平方根、三角関数、指数関数、対数関数、双曲線関数など、基本的で複雑な数学演算を行います。 <br>
-                                                画面上のボタンを使って計算機を操作します。 <br> <br>
-                                                <h3 style="text-decoration: underline; color: green">［操作方法］
-                                                </h3>
-                                                <ul style="all: revert;">
-                                                    <li style="text-align: left;">［C］ボタンをクリックしてから、操作してください
-                                                    </li>
-                                                    <li style="text-align: left;">単純に括弧やその他の数学演算を使用する方程式
-                                                    </li>
-                                                    <li style="text-align: left;">定義済みの π (パイ)や log, Exp(対数)
-                                                        を使って演算をすると時間を短縮できます</li>
-                                                    <li style="text-align: left;">メモリ機能を使って、累計を演算をします</li>
-                                                    <strong> [M+]: メモリへ画面に表示されている値を追加します<br>
-                                                        [MR]: メモリに保存している値を再度呼び出します <br>
-                                                        [M-]: メモリから画面に表示されている値を引きます
-                                                    </strong>
-                                                    <li style="text-align: left;">
-                                                        演算をする前に、角度（度数法・弧度法）を選択してください</li>
-                                                    <strong>注意: 既定値は度数法です</strong>
-                                                </ul>
-                                                <h3>
-                                                    <span style="text-decoration: underline; color: red">［注意事項］</span>
-                                                </h3>
-                                                <ul style="all: revert;">
-                                                    <li style="text-align: left;">一度に複数の演算を行うことはできません</li>
-                                                    <li style="text-align: left;">
-                                                        開き括弧・閉じ括弧の数が合わない、適切な位置に括弧がある</li>
-                                                    <li style="text-align: left;">
-                                                        演算中に角度（度数法・弧度法）を変更することはできません</li>
-                                                </ul>
-                                                <h3>
-                                                    <span style="text-decoration: underline;">制限事項：</span>
-                                                </h3>
-                                                <ul style="all: revert;">
-                                                    <li style="text-align: left;">キーボード操作はできません</li>
-                                                    <li style="text-align: left;">階乗演算は14桁までの精度で出力されます</li>
-                                                    <li style="text-align: left;">
-                                                        対数関数・双曲線関数の演算結果は5桁までの精度で出力されます</li>
-                                                    <li style="text-align: left;">
-                                                        10進数で15桁以上のモッド演算(mod)を行う場合、演算の精度が下がります</li>
-                                                    <br>
-                                                    <strong>
-                                                        モッド演算は15桁未満の演算で使用してください。（15桁未満の演算に適しています）</strong>
-                                                    <br>
-                                                    <li style="text-align: left;">計算機で演算可能な数値の範囲は 10(-323) ～
-                                                        10(308).0です</li>
-                                                </ul> <br> <br>
-                                            </span>
                                         </div>
                                         <div class="clear"></div>
                                     </div>
@@ -1110,9 +1054,7 @@
                     <td>Answered and Marked for Review</td>
                     <td>Not Visited</td>
                 </thead>
-                <tbody>
-
-                </tbody>
+                <tbody></tbody>
 
             </table>
             <div>Are sure you want to submit the Exam ?</div>
@@ -1150,36 +1092,6 @@
                     <div id="question-html">
                     </div>
                     <div id="question-response-area"></div>
-                    <!-- <script>triggerKeyboard(1, true)</script>
-                    <div style="padding-left: 4%;" id="numericKeyBoardDiv"><span id="ariaDescForSAinput"></span>
-                        <input aria-labelledby="ariaDescForSAinput" type="text" id="answer" autocomplete="off"
-                            class=" keyboardInput answer" readonly value="" onchange="checkSAMandatory(false)"
-                            style="text-align: left;">
-                        <div id="vKeyboard" class="vKeyboard " style="width: 145px;"><span class="vKeyboardSplKeys"
-                                role="button" tabindex="0" style="border-radius: 6px;">Backspace</span><br><span
-                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="Number 7"
-                                style="border-radius: 6px;">7</span><span class="vKeyboardKeys" role="button" tabindex="0"
-                                aria-label="Number 8" style="border-radius: 6px;">8</span><span class="vKeyboardKeys"
-                                role="button" tabindex="0" aria-label="Number 9"
-                                style="border-radius: 6px;">9</span><br><span class="vKeyboardKeys" role="button"
-                                tabindex="0" aria-label="Number 4" style="border-radius: 6px;">4</span><span
-                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="Number 5"
-                                style="border-radius: 6px;">5</span><span class="vKeyboardKeys" role="button" tabindex="0"
-                                aria-label="Number 6" style="border-radius: 6px;">6</span><br><span class="vKeyboardKeys"
-                                role="button" tabindex="0" aria-label="Number 1" style="border-radius: 6px;">1</span><span
-                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="Number 2"
-                                style="border-radius: 6px;">2</span><span class="vKeyboardKeys" role="button" tabindex="0"
-                                aria-label="Number 3" style="border-radius: 6px;">3</span><br><span class="vKeyboardKeys"
-                                role="button" tabindex="0" aria-label="Number 0" style="border-radius: 6px;">0</span><span
-                                class="vKeyboardKeys" role="button" tabindex="0" aria-label="point"
-                                style="border-radius: 6px;">.</span><span class="vKeyboardKeys" role="button" tabindex="0"
-                                aria-label="negative" style="border-radius: 6px;">-</span><br><span class="vKeyboardSplKeys"
-                                role="button" tabindex="0" data="left"
-                                style="font-weight: normal; border-radius: 6px;">←</span><span class="vKeyboardSplKeys"
-                                role="button" tabindex="0" data="right"
-                                style="font-weight: normal; border-radius: 6px;">→</span><br><span class="vKeyboardSplKeys"
-                                role="button" tabindex="0" style="border-radius: 6px;">Clear All</span><br></div>
-                    </div> -->
                     <div style="text-align: end;">
                         <img style="cursor: pointer;" width="30" height="30" alt="" src="images/Up.png"
                             id="question-container-scroll-up">
@@ -1246,28 +1158,6 @@
                 <div class="question-stats-active-section-subheader">Choose a Question</div>
                 <div class="questions-grid">
                     <div class="question_area" style="background-color: inherit;">
-                        <span objid="Answered" id="0" class="tipIcon numpan answered auditlog 0 selectedquestion"
-                            onclick="javascript:changeQues(0);; updatenumberpaneltabBtn(this)" tabindex="0" role="tab"
-                            aria-controls="currentQues" aria-selected="true" onkeypress="clickThisElement(this,event)"
-                            aria-label="Question 1, Answered, " style="pointer-events: auto;"> 1</span>
-                        <span objid="Marked for Review" id="1" class="tipIcon numpan review auditlog 1"
-                            onclick="javascript:changeQues(1);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
-                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
-                            aria-label="Question 2, Marked for Review, " style="pointer-events: auto;"> 2</span>
-                        <span objid="Not Answered" id="2" class="tipIcon numpan not_answered auditlog 2"
-                            onclick="javascript:changeQues(2);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
-                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
-                            aria-label="Question 3, Not Answered, " style="pointer-events: auto;"> 3</span>
-                        <span objid="Not Visited" id="3" class="tipIcon numpan not_visited auditlog 3"
-                            onclick="javascript:changeQues(3);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
-                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
-                            aria-label="Question 4, Not Visited, " style="pointer-events: auto;"> 4</span>
-                        <span objid="Answered &amp; Marked for Review (will also be evaluated)" id="4"
-                            class="tipIcon numpan review_answered auditlog 4"
-                            onclick="javascript:changeQues(4);; updatenumberpaneltabBtn(this)" tabindex="-1" role="tab"
-                            aria-controls="currentQues" aria-selected="false" onkeypress="clickThisElement(this,event)"
-                            aria-label="Question 5, Answered &amp; Marked for Review (will also be evaluated), "
-                            style="pointer-events: auto;"> 5</span>
                     </div>
                 </div>
                 <div style="background-color: #e5f6fd;text-align: center;border: 1px solid #c3c3c1;border-left: none;">
@@ -1278,44 +1168,6 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function () {
-
-            // Initial state (optional: set based on current display)
-            if ($('.collapsible-question-panel').css('display') === 'flex') {
-                $('.expand_icon').css('display', 'none');
-                $('.collapse_icon').css('display', 'inline');
-            } else {
-                $('.expand_icon').css('display', 'inline');
-                $('.collapse_icon').css('display', 'none');
-            }
-
-            // Click handler (adjust selector to whatever should trigger toggle)
-            $('.expand_icon, .collapse_icon').on('click', function () {
-
-                let panel = $('.collapsible-question-panel');
-
-                if (panel.css('display') === 'none') {
-                    // Show panel
-                    panel.css('display', 'flex');
-
-                    $('.expand_icon').css('display', 'none');
-                    $('.collapse_icon').css('display', 'inline');
-
-                } else {
-                    // Hide panel
-                    panel.css('display', 'none');
-
-                    $('.expand_icon').css('display', 'inline');
-                    $('.collapse_icon').css('display', 'none');
-                }
-
-            });
-
-        });
-
-
-    </script>
 
 </body>
 
