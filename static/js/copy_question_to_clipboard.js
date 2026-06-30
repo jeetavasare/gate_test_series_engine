@@ -12,29 +12,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // 1. Strip ALL image tags using regex before DOM parsing to prevent 404s
                     const safeHtml = data.html.replace(/<img[^>]*>/gi, '');
-
                     const correct_answer = data.correct_answer;
                     
-                    // 2. Parse the safe HTML
                     const tempDiv = document.createElement("div");
                     tempDiv.innerHTML = safeHtml;
                     
-                    // Add spaces between block elements so words don't mash together
-                    let plainText = tempDiv.innerText || tempDiv.textContent || "";
+                    // Find all ordered lists and dismantle them to prevent Markdown auto-numbering
+                    const orderedLists = tempDiv.querySelectorAll('ol');
+                    orderedLists.forEach(ol => {
+                        const listWrapper = document.createElement('div');
+                        const items = ol.querySelectorAll('li');
+                        
+                        items.forEach((li, index) => {
+                            const letter = String.fromCharCode(65 + index); 
+                            const paragraph = document.createElement('p');
+                            
+                            // Inject structural lettering directly without list item syntax
+                            paragraph.innerHTML = `<strong>${letter}.</strong> ` + li.innerHTML;
+                            listWrapper.appendChild(paragraph);
+                        });
+                        
+                        // Replace the original <ol> with the clean <div> structure
+                        ol.parentNode.replaceChild(listWrapper, ol);
+                    });
                     
-                    
-                    plainText = plainText.replaceAll("\t", "");
-                    plainText = plainText.replaceAll("\n\n", "\n");
-                    
-                    plainText += `\nCorrect Answer: ${correct_answer}`;
-                    if(user_answer){
-                        plainText += `\nYour Answer: ${user_answer}`;
-                    }
+                    const metaContainer = document.createElement("div");
+                    metaContainer.innerHTML = `<br><p><strong>Correct Answer:</strong> ${correct_answer}</p>` + 
+                        (user_answer ? `<p><strong>Your Answer:</strong> ${user_answer}</p>` : '');
+                    tempDiv.appendChild(metaContainer);
 
-                    // 3. Write actual text to clipboard (not the raw JSON response)
-                    await navigator.clipboard.writeText(plainText.trim());
+                    const htmlText = tempDiv.innerHTML;
+                    const plainText = tempDiv.innerText || tempDiv.textContent || "";
+                    
+                    const blobHtml = new Blob([htmlText], { type: 'text/html' });
+                    const blobText = new Blob([plainText], { type: 'text/plain' });
+                    
+                    const item = new ClipboardItem({
+                        'text/html': blobHtml,
+                        'text/plain': blobText
+                    });
+                    
+                    await navigator.clipboard.write([item]);
                     
                     this.innerText = 'Copied';
                     this.classList.replace('btn-outline-secondary', 'btn-outline-success');
@@ -47,10 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             setTimeout(() => {
-                // this.innerText = "Copied";
+                this.innerText = originalText;
                 this.classList.remove('btn-outline-success');
                 this.classList.add('btn-outline-secondary');
             }, 2000);
         });
     });
-})
+});
