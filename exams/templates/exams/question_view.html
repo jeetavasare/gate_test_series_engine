@@ -71,3 +71,7 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
 </div>
 
 {% endblock %}
+
+{% block end_js %}
+<script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
+{% endblock %}
