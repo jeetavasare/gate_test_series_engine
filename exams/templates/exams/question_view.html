@@ -35,7 +35,9 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
     <hr>
     <div class="d-flex gap-3 align-items-center">
         <div class="custom-bg-dark pill-small">
-            Correct Answer: {{ question.correct_answer }}
+            Correct Answer:
+            <span class="ans-content blurred" style="cursor: pointer;" data-answer="{{ question.correct_answer }}">XX</span>
+
         </div>
         <div>
             <a target="_blank" class="btn-custom pill-small"
@@ -74,4 +76,6 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
 
 {% block end_js %}
 <script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
+<script src="{% static 'js/answer_container_blurrer.js' %}"></script>
+
 {% endblock %}
