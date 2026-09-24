@@ -102,6 +102,7 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
         question_category = eq.question.category
         q_type = eq.question.q_type
         correct_answer = eq.question.correct_answer
+        question_attempted = eq.user_ans
         is_correct = False
         m_key = f"{int(marks_award)}m"
         perf[f'{m_key}_total_q'] += 1
@@ -160,10 +161,11 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
 
         if 'aptitude' in eq.question.category.lower():
             # HERE WE DO NOT ACCOUNT FOR MARKS FOR ALL QUESTION
-            if is_correct:
-                sections['General Aptitude']['marks_obtained'] += marks_award
-            else:
-                sections['General Aptitude']['marks_obtained'] -= marks_penalty
+            if question_attempted:
+                if is_correct:
+                    sections['General Aptitude']['marks_obtained'] += marks_award
+                else:
+                    sections['General Aptitude']['marks_obtained'] -= marks_penalty
 
             sections['General Aptitude']['questions'].append(eq)
             sections['General Aptitude']['marks'] += eq.question.marks_award
@@ -171,10 +173,12 @@ def calculate_attempt_performance(exam, attempt, exam_questions, user_responses)
             sections['General Aptitude']['time_spent_secs'] += eq.time_taken_sec
         else:
             # HERE WE DO NOT ACCOUNT FOR MARKS FOR ALL QUESTION
-            if is_correct:
-                sections['Technical']['marks_obtained'] += marks_award
-            else:
-                sections['Technical']['marks_obtained'] += marks_penalty
+            if question_attempted:
+                if is_correct:
+                    sections['Technical']['marks_obtained'] += marks_award
+                else:
+                    sections['Technical']['marks_obtained'] -= marks_penalty
+                    
             sections['Technical']['questions'].append(eq)
             sections['Technical']['marks'] += eq.question.marks_award
 
