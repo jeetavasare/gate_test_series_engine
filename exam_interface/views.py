@@ -397,20 +397,11 @@ def sync_session(request):
     
     return JsonResponse({"status": "ok"})
 
-@login_required
-@csrf_exempt
-@require_http_methods(["POST"])
-def submit_exam(request):
-    session = UserExamSession.objects.filter(user=request.user, current_stage='exam_started').first()
-    
-    if not ExamSessionValid(session):
-        return JsonResponse({"error": "exam_ended"}, status=403)
-
+def process_and_save_attempt(session):
     exam = session.exam
     recording = session.session_recording
     now = timezone.now()
 
-    # 1. Cache correct answers and marks for this exam to avoid N+1 queries
     eqs = ExamQuestion.objects.filter(exam=exam).select_related('question')
     q_dict = {
         eq.question.q_id: {
@@ -422,23 +413,12 @@ def submit_exam(request):
 
     total_marks = 0.0
     responses_array = []
-    
-    # # 2. Status map for your integer enum
-    # status_map = {
-    #     "not_visited": 0,
-    #     "not_answered": 1,
-    #     "answered": 2,
-    #     "marked_for_review": 3,
-    #     "answered_and_marked_for_review": 4
-    # }
 
-    # 3. Extract user responses and calculate marks
     for sec in recording.get('sections', []):
         for q in sec.get('questions', []):
             q_id = q['q_id']
             ans = q.get('user_ans')
 
-            # front end stores MSQ in ["A", "B"] store in attempt "A;B"
             if isinstance(ans, list):
                 ans = ";".join(sorted(str(a) for a in ans))
 
@@ -446,34 +426,33 @@ def submit_exam(request):
             status_str = q.get('status', 'not_visited')
             status_int = ques_status_map.get(status_str, 0)
             
-            # Append to the new optimized array format: [[q_id, ans, time_sec, status]]
             responses_array.append([q_id, ans, time_sec, status_int])
             
-            # Calculate Marks natively
             if q_id in q_dict:
                 q_data = q_dict[q_id]
-                
                 if q_data['correct'] == 'X':
                     total_marks += q_data['award']
-                elif ans: # User actually provided an answer
+                elif ans: 
                     if ans == q_data['correct']:
                         total_marks += q_data['award']
                     else:
                         total_marks -= q_data['penalty']
 
-    # Calculate final time taken
     if session.exam_start_time:
-        time_taken_secs = (now - session.exam_start_time).total_seconds()
+        max_end_time = session.exam_start_time + timedelta(minutes=exam.duration_mins)
+        effective_submit_time = min(now, max_end_time)
+        
+        time_taken_secs = (effective_submit_time - session.exam_start_time).total_seconds()
         time_taken_mins = int(time_taken_secs // 60)
     else:
+        effective_submit_time = now
         time_taken_mins = 0
 
-    # 4. Atomic Transaction: Persist the Attempt -> Destroy the Session
     with transaction.atomic():
         Attempt.objects.create(
-            user=request.user,
+            user=session.user,
             exam=exam,
-            submitted_at=now.isoformat(),
+            submitted_at=effective_submit_time.isoformat(),
             time_taken_mins=time_taken_mins,
             marks_obtained=round(total_marks, 2),
             exam_mode=session.exam_mode,
@@ -482,9 +461,34 @@ def submit_exam(request):
             compensatory_time_secs=session.compensatory_time_secs,
             responses=json.dumps(responses_array)
         )
-        
-        # Destroy the heavy session table row now that the data is safely in Attempt
         session.delete()
 
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def submit_exam(request):
+    session = UserExamSession.objects.filter(
+        user=request.user, 
+        current_stage='exam_started'
+    ).first()
+    
+    if not ExamSessionValid(session):
+        return JsonResponse({"error": "exam_ended"}, status=403)
+        
+    process_and_save_attempt(session)
+    
     return JsonResponse({"success": "ok"}, status=200)
+
+@login_required
+@csrf_exempt
+@require_http_methods(["GET"])
+def recover_stranded_sessions(request):
+    stuck_sessions = UserExamSession.objects.filter(current_stage='exam_ended')
+    
+    count = 0
+    for session in stuck_sessions:
+        process_and_save_attempt(session)
+        count += 1
+        
+    return JsonResponse({"status": "success", "recovered_count": count}, status=200)
 

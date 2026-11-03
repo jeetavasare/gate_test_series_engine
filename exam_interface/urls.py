@@ -23,6 +23,7 @@ exam_interface_apis = [
 urlpatterns = [
     path('gate/', include((gate_interface, 'exam'))),
     path('examprep/<int:exam_id>/', views.exam_prep, name='exam_prep'),
-    
+
+    path('recover-stranded-sessions/', views.recover_stranded_sessions, name='recover_stranded_sessions'),
     path('api/exam_interface/', include(exam_interface_apis)),
 ]
