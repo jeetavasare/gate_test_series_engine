@@ -110,39 +110,11 @@
                 <span class="text-info-emphasis text-decoration-underline ms-2" style="cursor: pointer;" onclick="blurAllAnswers()">Hide all answers</span>
             </div>
 
-            {% for q in questions %}
-            <div class="card p-4 shadow-sm mb-4" style="border-left: 5px solid var(--border-color);">
-                <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
-                    <span class="oval-pill">
-                        <a class="text-decoration-none text-reset" href="{% url 'view_question' q.q_id %}">
-                            Q{{ forloop.counter }}
-                        </a>
-                    </span>
-                    <span class="pill-small custom-bg-dark fs-6">{{ q.q_type }}</span>
-                    <span class="pill-small custom-bg-dark fs-6">Award: <span>{{ q.marks_award }}</span></span>
-                    <span class="pill-small custom-bg-dark fs-6">Penalty: <span>{{ q.marks_penalty|floatformat:2 }}</span></span>
-                    <span class="pill-small custom-bg-dark fs-6">{{ q.category }}</span>
-                    <span class="pill-small custom-bg-dark fs-6">{{ q.exam_display_name }}</span>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn ms-auto" title="Copy question text"
-                        data-qid="{{ q.q_id }}">📄 </button>
-                </div>
-
-                <hr>
-                <div class="question-content" style="font-size: 1.1rem;">
-                    {{ q.question_html|safe }}
-                </div>
-                <hr>
-                
-                <div class="d-flex gap-3 align-items-center">
-                    <div class="custom-bg-dark pill-small">
-                        Correct Answer: <span class="ans-content blurred" style="cursor: pointer;" data-answer="{{q.correct_answer}}">XX</span>
-                    </div>
-                    <div>
-                        <a target="_blank" class="btn-custom pill-small" href="https://gateoverflow.in/{{ q.q_id }}">Discuss</a>
-                    </div>
-                </div>
+            <div class="question-list-wrapper">
+                {% for q in questions %}
+                    {% include 'exams/components/_question_card.html' with q=q q_order=forloop.counter show_q_order=True heat_map_color=False use_heatmap=False exam_display_name=q.exam_display_name show_exam_name=True user_ans=False show_user_ans=False ans_status=False color_class=False show_ans_status=False time_taken=False time_taken_class=False show_time_taken=False q_status=False historical_rank=False show_q_status=False accuracy_percent=False show_accuracy=False blur_answer=True %}
+                {% endfor %}
             </div>
-            {% endfor %}
             
         {% elif not error_msg and request.GET %}
             <p class="text-muted">No questions found matching the selected criteria.</p>
@@ -155,7 +127,6 @@
 {% endblock %}
 
 {% block end_js %}
-<script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
-<script src="{% static 'js/answer_container_blurrer.js' %}"></script>
+<script src="{% static 'js/question_list_features.js' %}"></script>
 
 {% endblock %}

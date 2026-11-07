@@ -409,78 +409,11 @@ Result: {{exam.display_title}}
 
             <hr class="m-0 p-2" style="border-color: var(--border-color);">
 
-            {% for eq in data.questions %}
-            <div class="card p-4 shadow-sm mb-4"
-                style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }}; border-left: 5px solid var(--local-color);">
-
-            <div class="d-flex justify-content-between align-items-stretch mb-2 user-select-none">
-                <div class="zone-copy-ref d-flex gap-2 align-items-center flex-wrap"
-                    style="flex: 1 1 50%; cursor: pointer;"
-                    title="Click to copy formatted reference link"
-                    data-qid="{{ eq.question.q_id }}"
-                    data-category="{{ eq.question.category }}"
-                    data-type="{{ eq.question.q_type }}"
-                    data-marks="{{ eq.question.marks_award }}"
-                    data-url="{% url 'view_question' eq.question_id %}">
-                    <!-- <span class="oval-pill">Q{{ eq.original_order|default:forloop.counter }}</span> -->
-                    <span class="oval-pill">
-                        <a class="text-decoration-none text-reset" target="_blank" href="{% url 'view_question' eq.question_id %}">
-                            Q{{ forloop.counter }}
-                        </a>
-                    </span>
-                    <span class="pill-small custom-bg-dark fs-6">{{ eq.question.q_type }}</span>
-                    <span class="pill-small custom-bg-dark fs-6">Award: {{ eq.question.marks_award }}</span>
-                    <span class="pill-small custom-bg-dark fs-6">
-                        Penalty: {{eq.question.marks_penalty|floatformat:2}}</span>
-                    <span class="pill-small custom-bg-dark fs-6">{{ eq.question.category }}</span>
-                </div>
-
-                <div class="zone-copy-text d-flex justify-content-end align-items-center"
-                    style="flex: 1 1 50%; cursor: pointer;"
-                    title="Click to copy question content">
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" title="Copy question text" data-user-answer="{{eq.user_ans}}"
-                        data-qid="{{ eq.question.q_id }}">📄</button>
-                </div>
+            <div class="question-list-wrapper">
+                {% for eq in data.questions %}
+                    {% include 'exams/components/_question_card.html' with q=eq.question q_order=eq.original_order|default:forloop.counter show_q_order=True heat_map_color=eq.heat_map_color use_heatmap=True exam_display_name=False show_exam_name=False user_ans=eq.user_ans show_user_ans=True ans_status=eq.ans_status color_class=eq.color_class show_ans_status=True time_taken=eq.formatted_time_taken time_taken_class=eq.time_taken_class show_time_taken=True q_status=eq.q_status historical_rank=attempt.historical_rank show_q_status=True accuracy_percent=eq.accuracy_percent show_accuracy=True blur_answer=True %}
+                {% endfor %}
             </div>
-                {% if 1 %}
-                <div class="text-muted small" title="Toppers (Top 10%) average accuracy for this question in this exam">
-                    Toppers Accuracy: <b>{{ eq.accuracy_percent }}%</b>
-                </div>
-                {% endif %}
-
-                <hr>
-                <div class="question-content" style="font-size: 1.1rem;">
-                    {{ eq.question.question_html|safe }}
-                </div>
-                <hr>
-
-                <div class="d-flex gap-3 align-items-center flex-wrap">
-                    <div class="custom-bg-dark pill-small">
-                        Your Answer: <span class="fw-bold">{{ eq.user_ans }}</span>
-                    </div>
-                    <div class="pill-small custom-bg-dark">
-                        Correct Answer: {{ eq.question.correct_answer }}
-                    </div>
-                    <div class="pill-small custom-bg-dark {{ eq.color_class }}">
-                        {{ eq.ans_status }}
-                    </div>
-                    <div class="pill-small custom-bg-dark">
-                        Time: <span class="{{eq.time_taken_class}}">{{ eq.formatted_time_taken }}</span>
-                    </div>
-                    
-                    {% if not attempt.historical_rank %}
-                        <div class="pill-small custom-bg-dark" title="State of this question at the time of submission">
-                            Status: {{ eq.q_status }}
-                        </div>
-                    {% endif %}
-                        
-                    <div>
-                        <a target="_blank" class="btn-custom pill-small"
-                            href="https://gateoverflow.in/{{ eq.question.q_id }}">Discuss</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
             <div class="mt-5 mb-5"></div>
             {% endfor %}
         </div>
@@ -496,78 +429,6 @@ Result: {{exam.display_title}}
 {% block end_js %}
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 <script src="/static/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
+<script src="{% static 'js/question_list_features.js' %}"></script>
 <script src="{% static 'js/auto_format_date.js' %}"></script>
-
-
-<script>
-document.addEventListener('click', (e) => {
-    // 1. Check if clicked within the Left Zone (Reference Copy)
-    const refZone = e.target.closest('.zone-copy-ref');
-    if (refZone) {
-        // Do not intercept if user specifically clicked the anchor tag
-        if (e.target.closest('a')) {
-            return;
-        }
-        copyQuestionReference(refZone);
-        return;
-    }
-
-    // 2. Check if clicked within the Right Zone (Question Text Copy)
-    const textZone = e.target.closest('.zone-copy-text');
-    if (textZone) {
-        // If clicking the button directly, let its default listener run normally
-        if (e.target.closest('.copy-btn')) {
-            return;
-        }
-        triggerQuestionCopy(textZone);
-    }
-});
-/**
- * Function 1: Builds the formatted reference string and copies both rich HTML and Markdown.
- * Maps 'Numerical', 'Multiple Choice', 'Multiple Select' to 'NAT', 'MCQ', 'MSQ'.
- */
-function copyQuestionReference(refElement) {
-    const qid = refElement.dataset.qid || '';
-    const category = refElement.dataset.category || '';
-    const rawType = (refElement.dataset.type || '').trim();
-    const marks = Math.trunc(Number(refElement.dataset.marks || 0));;
-    const relativeUrl = refElement.dataset.url || '';
-    const fullUrl = new URL(relativeUrl, window.location.origin).href;
-
-    const typeMapping = {
-        'Numerical': 'NAT',
-        'Multiple Choice': 'MCQ',
-        'Multiple Select': 'MSQ'
-    };
-    const mappedType = typeMapping[rawType] || rawType;
-
-    // Output: Q381853: CO & Architecture(NAT) 2m
-    const formattedTitle = `Q${qid}: ${category}(${mappedType}) ${marks}m`;
-    const html = `<a href="${fullUrl}">${formattedTitle}</a>`;
-
-    const listener = (e) => {
-        e.clipboardData.setData('text/html', html);
-        e.clipboardData.setData('text/plain', fullUrl);
-        e.preventDefault();
-    };
-
-    document.addEventListener('copy', listener);
-    document.execCommand('copy');
-    document.removeEventListener('copy', listener);
-}
-
-/**
- * Function 2: Finds and triggers the native click event of the copy button inside the container.
- */
-function triggerQuestionCopy(zoneElement) {
-    const copyBtn = zoneElement.querySelector('.copy-btn');
-    if (copyBtn) {
-        copyBtn.click();
-    }
-}
-
-</script>
-
-
 {% endblock %}

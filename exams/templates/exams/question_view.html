@@ -16,34 +16,8 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
 
 {% block page_content %}
 
-<div class="card p-4 shadow-sm mb-4">
-    <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
-        <span class="oval-pill">Q</span>
-        <span class="pill-small custom-bg-dark fs-6">{{ question.q_type }}</span>
-        <span class="pill-small custom-bg-dark fs-6">Award: <span>{{ question.marks_award }}</span></span>
-        <span class="pill-small custom-bg-dark fs-6">Penalty:
-            <span>{{question.marks_penalty|floatformat:2}}</span></span>
-        <span class="pill-small custom-bg-dark fs-6">{{ question.category }}</span>
-        <button class="btn btn-sm btn-outline-secondary copy-btn ms-auto" title="Copy question text"
-            data-qid="{{ question.q_id }}">📄 </button>
-    </div>
-
-    <hr>
-    <div class="question-content" style="/* max-height: 800px ;*/ font-size: 1.1rem;">
-        {{ question.question_html|safe }}
-    </div>
-    <hr>
-    <div class="d-flex gap-3 align-items-center">
-        <div class="custom-bg-dark pill-small">
-            Correct Answer:
-            <span class="ans-content blurred" style="cursor: pointer;" data-answer="{{ question.correct_answer }}">XX</span>
-
-        </div>
-        <div>
-            <a target="_blank" class="btn-custom pill-small"
-                href="https://gateoverflow.in/{{ question.q_id }}">Discuss</a>
-        </div>
-    </div>
+<div class="question-list-wrapper">
+    {% include 'exams/components/_question_card.html' with q=question q_order=False show_q_order=False heat_map_color=False use_heatmap=False exam_display_name=False show_exam_name=False user_ans=False show_user_ans=False ans_status=False color_class=False show_ans_status=False time_taken=False time_taken_class=False show_time_taken=False q_status=False historical_rank=False show_q_status=False accuracy_percent=False show_accuracy=False blur_answer=True %}
 </div>
 
 
@@ -75,7 +49,6 @@ Q{{question.q_id}}: {{question.category}}({{short_q_type}}) {{question.marks_awa
 {% endblock %}
 
 {% block end_js %}
-<script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
-<script src="{% static 'js/answer_container_blurrer.js' %}"></script>
+<script src="{% static 'js/question_list_features.js' %}"></script>
 
 {% endblock %}

@@ -57,47 +57,11 @@ Que Paper: {{exam.display_title}}
         <hr class="m-0 p-2" style="border-color: var(--border-color);">
 
 
-        {% for eq in data.questions %}
-        <div class="card p-4 shadow-sm mb-4"
-            style="--local-color: {{ eq.heat_map_color|default:'var(--border-color)' }}; border-left: 5px solid var(--local-color);">
-            <div class="d-flex gap-2 align-items-center mb-2 flex-wrap">
-                <span class="oval-pill">
-                    <a class="text-decoration-none text-reset" href="{% url 'view_question' eq.question_id %}">
-                        Q{{eq.original_order|default:forloop.counter }}
-                    </a>
-                </span>
-                <span class="pill-small custom-bg-dark fs-6">{{ eq.question.q_type }}</span>
-                <span class="pill-small custom-bg-dark fs-6">Award: <span>{{ eq.question.marks_award }}</span></span>
-                <span class="pill-small custom-bg-dark fs-6">Penalty:
-                    <span>{{eq.question.marks_penalty|floatformat:2}}</span></span>
-                <span class="pill-small custom-bg-dark fs-6">{{ eq.question.category }}</span>
-                <button class="btn btn-sm btn-outline-secondary copy-btn ms-auto" title="Copy question text"
-                    data-qid="{{ eq.question.q_id }}">📄 </button>
-            </div>
-
-            {% if 1 %}
-            <div class="text-muted small" title="Toppers (Top 10%) average accuracy for this question in this exam">
-                Toppers Accuracy: <b>{{ eq.accuracy_percent }}%</b>
-            </div>
-            {% endif %}
-
-            <hr>
-            <div class="question-content" style="/* max-height: 800px ;*/ font-size: 1.1rem;">
-                {{ eq.question.question_html|safe }}
-            </div>
-            <hr>
-            <div class="d-flex gap-3 align-items-center">
-                <div class="custom-bg-dark pill-small">
-                    Correct Answer:
-                    <span class="ans-content blurred" style="cursor: pointer;" data-answer="{{ eq.question.correct_answer }}">XX</span>
-                </div>
-                <div>
-                    <a target="_blank" class="btn-custom pill-small"
-                        href="https://gateoverflow.in/{{ eq.question_id }}">Discuss</a>
-                </div>
-            </div>
+        <div class="question-list-wrapper">
+            {% for eq in data.questions %}
+                {% include 'exams/components/_question_card.html' with q=eq.question q_order=eq.original_order|default:forloop.counter show_q_order=True heat_map_color=eq.heat_map_color use_heatmap=True exam_display_name=False show_exam_name=False user_ans=False show_user_ans=False ans_status=False color_class=False show_ans_status=False time_taken=False time_taken_class=False show_time_taken=False q_status=False historical_rank=False show_q_status=False accuracy_percent=eq.accuracy_percent show_accuracy=True blur_answer=True %}
+            {% endfor %}
         </div>
-        {% endfor %}
 
         {% endfor %}
     </div>
@@ -107,7 +71,6 @@ Que Paper: {{exam.display_title}}
 {% endblock %}
 
 {% block end_js %}
-<script src="{% static 'js/copy_question_to_clipboard.js' %}"></script>
+<script src="{% static 'js/question_list_features.js' %}"></script>
 <script src="{% static 'js/auto_format_date.js' %}"></script>
-<script src="{% static 'js/answer_container_blurrer.js' %}"></script>
 {% endblock %}

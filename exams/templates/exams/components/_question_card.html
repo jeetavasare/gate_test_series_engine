@@ -1,0 +1,95 @@
+<div class="card p-4 shadow-sm mb-4" 
+     style="{% if use_heatmap %}--local-color: {{ heat_map_color|default:'var(--border-color)' }}; border-left: 5px solid var(--local-color);{% else %}border-left: 1px solid var(--border-color);{% endif %}">
+    
+    <div class="d-flex justify-content-between align-items-stretch mb-2 user-select-none">
+        <div class="zone-copy-ref d-flex gap-2 align-items-center flex-wrap"
+            style="flex: 1 1 65%; cursor: pointer;"
+            title="Click to copy formatted reference link"
+            data-qid="{{ q.q_id }}"
+            data-category="{{ q.category }}"
+            data-type="{{ q.q_type }}"
+            data-marks="{{ q.marks_award }}"
+            data-url="{% url 'view_question' q.q_id %}">
+            
+            <span class="oval-pill">
+                {% if show_q_order %}
+                    <a class="text-decoration-none text-reset" target="_blank" href="{% url 'view_question' q.q_id %}">
+                        Q{{ q_order }}
+                    </a>
+                {% else %}
+                    Q
+                {% endif %}
+            </span>
+            <span class="pill-small custom-bg-dark fs-6">{{ q.q_type }}</span>
+            <span class="pill-small custom-bg-dark fs-6">Award: <span>{{ q.marks_award }}</span></span>
+            <span class="pill-small custom-bg-dark fs-6">Penalty: <span>{{ q.marks_penalty|floatformat:2 }}</span></span>
+            <span class="pill-small custom-bg-dark fs-6">{{ q.category }}</span>
+            
+            {% if show_exam_name %}
+                <span class="pill-small custom-bg-dark fs-6">{{ exam_display_name }}</span>
+            {% endif %}
+        </div>
+
+        <div class="zone-copy-text d-flex justify-content-end align-items-center"
+            style="flex: 1 1 50%; cursor: pointer;"
+            title="Click to copy question content">
+            <button class="btn btn-sm btn-outline-secondary copy-btn" title="Copy question text" 
+                {% if show_user_ans %}data-user-answer="{{ user_ans }}"{% endif %}
+                data-qid="{{ q.q_id }}">📄</button>
+        </div>
+    </div>
+
+    {% if show_accuracy %}
+    <div class="text-muted small" title="Toppers (Top 10%) average accuracy for this question in this exam">
+        Toppers Accuracy: <b>{{ accuracy_percent }}%</b>
+    </div>
+    {% endif %}
+
+    <hr>
+    <div class="question-content" style="font-size: 1.1rem;">
+        {{ q.question_html|safe }}
+    </div>
+    <hr>
+    
+    <div class="d-flex gap-3 align-items-center flex-wrap">
+        {% if show_user_ans %}
+            <div class="custom-bg-dark pill-small">
+                Your Answer: <span class="fw-bold">{{ user_ans }}</span>
+            </div>
+        {% endif %}
+        
+        <div class="pill-small custom-bg-dark">
+            Correct Answer: 
+            {% if blur_answer %}
+                <span class="ans-content blurred" style="cursor: pointer;" data-answer="{{ q.correct_answer }}">XX</span>
+            {% else %}
+                <span>{{ q.correct_answer }}</span>
+            {% endif %}
+        </div>
+        
+        {% if show_ans_status %}
+            <div class="pill-small custom-bg-dark {{ color_class }}">
+                {{ ans_status }}
+            </div>
+        {% endif %}
+        
+        {% if show_time_taken %}
+            <div class="pill-small custom-bg-dark">
+                Time: <span class="{{ time_taken_class }}">{{ time_taken }}</span>
+            </div>
+        {% endif %}
+
+        {% if show_q_status %}
+            {% if not historical_rank %}
+            <!-- This is beccause viewing results which have historical rank is old results don't have status stored of those -->
+                <div class="pill-small custom-bg-dark" title="State of this question at the time of submission">
+                    Status: {{ q_status }}
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div>
+            <a target="_blank" class="btn-custom pill-small" href="https://gateoverflow.in/{{ q.q_id }}">Discuss</a>
+        </div>
+    </div>
+</div>
